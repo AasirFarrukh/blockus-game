@@ -1,0 +1,306 @@
+.board-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  flex-direction: column;
+  gap: 12px;
+  --cell-size: min(
+    calc((100vh - 200px) / 20),
+    calc((100vw - 350px) / 20),
+    40px
+  );
+}
+
+/* Current Player Banner */
+.current-player-banner {
+  padding: 10px 28px;
+  border-radius: 25px;
+  color: white;
+  font-weight: 700;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  animation: bannerPop 0.4s ease-out;
+}
+
+.banner-text {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes bannerPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(-10px);
+  }
+  50% {
+    transform: scale(1.05) translateY(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Board wrapper with wooden frame effect */
+.board-wrapper {
+  position: relative;
+  padding: 12px;
+  background: linear-gradient(145deg, #3d2817 0%, #2a1a0f 50%, #1f1409 100%);
+  border-radius: 16px;
+  box-shadow:
+    0 0 0 4px #5c3d2a,
+    0 0 0 6px #2a1a0f,
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    inset 0 2px 4px rgba(255, 255, 255, 0.1);
+}
+
+/* Inner frame highlight */
+.board-wrapper::before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  right: 4px;
+  bottom: 4px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  pointer-events: none;
+}
+
+/* Coordinate labels */
+.board-coordinates {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.coordinate-label {
+  font-size: 9px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.4);
+  text-align: center;
+  user-select: none;
+}
+
+.coordinate-row {
+  width: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 26px;
+}
+
+.coordinate-col {
+  width: 26px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.coordinates-top, .coordinates-bottom {
+  display: flex;
+  margin-left: 18px;
+}
+
+.coordinates-left, .coordinates-right {
+  display: flex;
+  flex-direction: column;
+}
+
+.board-with-coords {
+  display: flex;
+  align-items: center;
+}
+
+.board-inner {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Toast notification */
+.toast {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--text-primary);
+  color: white;
+  padding: 12px 24px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 600;
+  z-index: 100;
+  animation: toastFadeInOut 2s ease-in-out forwards;
+  pointer-events: none;
+  white-space: nowrap;
+  box-shadow: var(--shadow-lg);
+}
+
+@keyframes toastFadeInOut {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+  15% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  85% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+}
+
+/* Board styles */
+.board {
+  display: inline-block;
+  background: #e0e0e0;
+  padding: 2px;
+  border-radius: 4px;
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.board-row {
+  display: flex;
+}
+
+.board-cell {
+  width: var(--cell-size, 26px);
+  height: var(--cell-size, 26px);
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.board-cell:hover:not(.filled):not(.preview) {
+  background: #f5f5f5;
+  border-color: #d0d0d0;
+}
+
+.board-cell.filled {
+  border-color: rgba(0, 0, 0, 0.3);
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.25),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Valid preview - with drop shadow */
+.board-cell.preview.valid {
+  border: 2px solid rgba(52, 211, 153, 0.8);
+  box-shadow:
+    0 4px 8px rgba(0, 0, 0, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  z-index: 10;
+}
+
+/* Invalid preview - with drop shadow */
+.board-cell.preview.invalid {
+  border: 2px solid rgba(248, 113, 113, 0.8);
+  box-shadow:
+    0 4px 8px rgba(0, 0, 0, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+  z-index: 10;
+}
+
+/* Just placed animation */
+.board-cell.just-placed {
+  animation: placeSlide 0.3s ease-out;
+}
+
+@keyframes placeSlide {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Corner markers - simple dots */
+.corner-marker {
+  position: absolute;
+  width: calc(var(--cell-size, 26px) * 0.4);
+  height: calc(var(--cell-size, 26px) * 0.4);
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+}
+
+/* Active corner marker for current player */
+.corner-marker.active {
+  width: calc(var(--cell-size, 26px) * 0.55);
+  height: calc(var(--cell-size, 26px) * 0.55);
+  animation: cornerPulse 1.5s ease-in-out infinite;
+}
+
+/* Neutral corner marker */
+.corner-marker.neutral {
+  border-style: dashed;
+}
+
+/* Neutral banner indicator */
+.current-player-banner.neutral {
+  border: 2px dashed rgba(255, 255, 255, 0.5);
+}
+
+@keyframes cornerPulse {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  }
+}
+
+/* Turn indicator */
+.turn-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 20px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-default);
+  box-shadow: var(--shadow-md);
+}
+
+.turn-indicator-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  animation: pulseGlow 1.5s ease-in-out infinite;
+}
+
+.turn-indicator-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.turn-indicator-player {
+  font-weight: 700;
+}
