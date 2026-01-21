@@ -69,7 +69,6 @@ function App() {
     placePiece,
     resetGame,
     gameOver,
-    setGameOver,
     undoMove,
     canUndo,
     playersOut,
