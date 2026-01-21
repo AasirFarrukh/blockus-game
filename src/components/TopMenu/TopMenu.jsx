@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './TopMenu.css';
-import { PLAYER_COLORS, PIECE_SHAPES, PLAYER_MODES } from '../../data/pieces';
+import { PLAYER_COLORS, PIECE_SHAPES, PLAYER_MODES, COLOR_NAMES } from '../../data/pieces';
 
 const TopMenu = ({
   currentPlayer,
