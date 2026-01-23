@@ -24,6 +24,11 @@ const StartScreen = ({ onStartGame }) => {
   return (
     <div className="start-screen">
       <div className="start-content">
+        <img
+          src="/blokusLogo.jpg"
+          alt="Blokus Logo"
+          className="start-logo"
+        />
         <h1 className="start-title">BLOKUS</h1>
         <p className="start-subtitle">The Strategy Game of Territorial Domination</p>
 

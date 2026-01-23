@@ -31,6 +31,26 @@
   }
 }
 
+/* Logo styling */
+.start-logo {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  margin-bottom: 15px;
+  animation: logoFloat 3s ease-in-out infinite;
+}
+
+@keyframes logoFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
 /* Animated Blokus title - keeping the gradient animation */
 .start-title {
   font-size: 64px;
@@ -405,6 +425,12 @@
     border-radius: var(--radius-lg);
   }
 
+  .start-logo {
+    width: 90px;
+    height: 90px;
+    margin-bottom: 12px;
+  }
+
   .start-title {
     font-size: 36px;
     letter-spacing: 4px;
@@ -539,6 +565,12 @@
 
   .start-content {
     padding: 16px 12px;
+  }
+
+  .start-logo {
+    width: 70px;
+    height: 70px;
+    margin-bottom: 10px;
   }
 
   .start-title {
