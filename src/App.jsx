@@ -7,7 +7,7 @@ import TopMenu from './components/TopMenu/TopMenu';
 import StartScreen from './components/StartScreen/StartScreen';
 import { useGameState } from './hooks/useGameState';
 import { isValidPlacement } from './utils/validation';
-import { PLAYER_NAMES, PIECE_SHAPES, PLAYER_MODES, PLAYER_COLORS } from './data/pieces';
+import { PLAYER_NAMES, PIECE_SHAPES, PLAYER_MODES, PLAYER_COLORS, COLOR_NAMES } from './data/pieces';
 import { rotatePiece, flipPiece } from './utils/gameLogic';
 
 // Sound effects using Web Audio API
@@ -80,6 +80,9 @@ function App() {
   // Mobile-specific state
   const isMobile = useIsMobile();
   const [mobilePosition, setMobilePosition] = useState({ row: 10, col: 10 });
+
+  // Skipped players notification
+  const [skippedNotification, setSkippedNotification] = useState(null);
 
   // Rotation/flip state (needed for mobile controls)
   const [rotation, setRotation] = useState(0);
@@ -173,11 +176,26 @@ function App() {
     const result = placePiece(row, col, shape, pieceId);
     if (result && result.success) {
       if (sounds && soundEnabled) sounds.place();
+      // Show notification if any players were skipped
+      if (result.skippedPlayers && result.skippedPlayers.length > 0) {
+        const skippedNames = result.skippedPlayers.map(id => COLOR_NAMES[id]);
+        setSkippedNotification(skippedNames);
+      }
     } else if (result && !result.success) {
       if (sounds && soundEnabled) sounds.invalid();
     }
     return result;
   };
+
+  // Auto-dismiss skipped notification
+  useEffect(() => {
+    if (skippedNotification) {
+      const timer = setTimeout(() => {
+        setSkippedNotification(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [skippedNotification]);
 
   const handleSelectPiece = (piece) => {
     if (piece && sounds && soundEnabled) sounds.select();
@@ -453,6 +471,19 @@ function App() {
 
   return (
     <div className="App">
+      {skippedNotification && (
+        <div className="skipped-notification">
+          <div className="skipped-content">
+            <span className="skipped-icon">⏭️</span>
+            <span className="skipped-text">
+              {skippedNotification.length === 1
+                ? `${skippedNotification[0]} has no valid moves - skipped!`
+                : `${skippedNotification.join(' & ')} have no valid moves - skipped!`}
+            </span>
+          </div>
+        </div>
+      )}
+
       {gameOver && (
         <div className="game-over-overlay">
           <div className="game-over-modal">

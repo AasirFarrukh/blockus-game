@@ -100,6 +100,7 @@ export const useGameState = (initialPlayerCount = 4) => {
     let nextColor = (startColor + 1) % 4;
     let checked = 0;
     let newNeutralTurnPlayer = currentNeutralTurnPlayer;
+    const skippedPlayers = []; // Track which players were skipped
 
     // For 3-player mode, update neutral turn player when moving past the neutral color
     if (playerCount === 3 && startColor === PLAYER_MODES[3].neutralColor) {
@@ -110,10 +111,11 @@ export const useGameState = (initialPlayerCount = 4) => {
       if (!newPlayersOut[nextColor]) {
         // Check if this color has valid moves
         if (hasValidMoves(newBoard, nextColor, newUsedPieces, newFirstMoves[nextColor])) {
-          return { nextPlayer: nextColor, updatedPlayersOut: newPlayersOut, newNeutralTurnPlayer };
+          return { nextPlayer: nextColor, updatedPlayersOut: newPlayersOut, newNeutralTurnPlayer, skippedPlayers };
         } else {
-          // Mark color as out
+          // Mark color as out and track it
           newPlayersOut = { ...newPlayersOut, [nextColor]: true };
+          skippedPlayers.push(nextColor);
         }
       }
 
@@ -127,7 +129,7 @@ export const useGameState = (initialPlayerCount = 4) => {
     }
 
     // All colors are out - game over
-    return { nextPlayer: startColor, updatedPlayersOut: newPlayersOut, gameOver: true, newNeutralTurnPlayer };
+    return { nextPlayer: startColor, updatedPlayersOut: newPlayersOut, gameOver: true, newNeutralTurnPlayer, skippedPlayers };
   }, [playerCount]);
 
   // Place a piece on the board
@@ -177,7 +179,7 @@ export const useGameState = (initialPlayerCount = 4) => {
       : firstMoves;
 
     // Find next color (auto-skip those without valid moves)
-    const { nextPlayer, updatedPlayersOut, gameOver: isGameOver, newNeutralTurnPlayer } = findNextPlayer(
+    const { nextPlayer, updatedPlayersOut, gameOver: isGameOver, newNeutralTurnPlayer, skippedPlayers } = findNextPlayer(
       currentPlayer,
       newBoard,
       newUsedPieces,
@@ -200,7 +202,7 @@ export const useGameState = (initialPlayerCount = 4) => {
       setGameOver(true);
     }
 
-    return { success: true };
+    return { success: true, skippedPlayers };
   }, [board, currentPlayer, firstMoves, usedPieces, playersOut, neutralTurnPlayer, findNextPlayer]);
 
   // Undo last move
