@@ -7,7 +7,7 @@
   box-shadow: var(--shadow-md);
   width: 100%;
   height: 100%;
-  overflow: hidden;
+  overflow: visible;
 }
 
 /* Only show on mobile */
@@ -16,9 +16,11 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    padding: 10px;
+    justify-content: center;
+    gap: 12px;
+    padding: 8px 12px;
+    height: auto;
+    min-height: 100%;
   }
 }
 
@@ -27,12 +29,12 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   flex-shrink: 0;
 }
 
 .preview-label {
-  font-size: 9px;
+  font-size: 8px;
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -40,23 +42,22 @@
 }
 
 .preview-piece {
-  transform: scale(0.9);
+  transform: scale(0.85);
+  transform-origin: center;
 }
 
 .preview-piece .piece-container {
   min-height: auto;
-  padding: 4px;
+  padding: 3px;
   pointer-events: none;
 }
 
 /* D-Pad Controls */
 .dpad-container {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(3, 1fr);
-  gap: 4px;
-  width: 110px;
-  height: 110px;
+  grid-template-columns: repeat(3, 32px);
+  grid-template-rows: repeat(3, 32px);
+  gap: 2px;
   flex-shrink: 0;
 }
 
@@ -65,8 +66,8 @@
   align-items: center;
   justify-content: center;
   background: var(--bg-tertiary);
-  border: 2px solid var(--border-default);
-  border-radius: var(--radius-md);
+  border: 1.5px solid var(--border-default);
+  border-radius: var(--radius-sm);
   cursor: pointer;
   transition: all var(--transition-fast);
   color: var(--text-primary);
@@ -76,15 +77,15 @@
 }
 
 .dpad-btn svg {
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
 }
 
 .dpad-btn:active {
   background: var(--btn-secondary);
   border-color: var(--btn-secondary);
   color: white;
-  transform: scale(0.95);
+  transform: scale(0.9);
 }
 
 .dpad-up {
@@ -105,10 +106,11 @@
   justify-content: center;
   background: var(--bg-tertiary);
   border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border-default);
 }
 
 .position-indicator {
-  font-size: 10px;
+  font-size: 8px;
   font-weight: 600;
   color: var(--text-muted);
   font-family: monospace;
@@ -128,7 +130,7 @@
 .transform-controls {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   flex-shrink: 0;
 }
 
@@ -136,24 +138,26 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 10px 14px;
+  gap: 4px;
+  padding: 8px 12px;
   background: var(--btn-secondary);
   border: none;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   color: white;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   cursor: pointer;
   transition: all var(--transition-fast);
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
-  min-width: 80px;
+  min-width: 70px;
+  white-space: nowrap;
 }
 
 .transform-btn svg {
-  width: 18px;
-  height: 18px;
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
 }
 
 .transform-btn:active {
@@ -173,7 +177,7 @@
 .action-controls {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   flex-shrink: 0;
 }
 
@@ -181,24 +185,26 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 12px 16px;
+  gap: 4px;
+  padding: 10px 14px;
   border: none;
-  border-radius: var(--radius-md);
-  font-size: 13px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
   font-weight: 700;
   cursor: pointer;
   transition: all var(--transition-fast);
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  min-width: 90px;
+  letter-spacing: 0.3px;
+  min-width: 75px;
+  white-space: nowrap;
 }
 
 .action-btn svg {
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
 }
 
 .action-btn:active:not(:disabled) {
@@ -211,7 +217,7 @@
 }
 
 .place-btn.valid {
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
 }
 
 .place-btn.invalid {
@@ -237,60 +243,21 @@
   border-color: var(--btn-danger);
 }
 
-/* Smaller screens adjustments */
+/* Smaller screens - compact layout */
 @media (max-width: 480px) {
   .mobile-controls {
-    padding: 8px;
+    padding: 6px 8px;
     gap: 8px;
   }
 
-  .dpad-container {
-    width: 95px;
-    height: 95px;
-    gap: 3px;
-  }
-
-  .dpad-btn svg {
-    width: 16px;
-    height: 16px;
-  }
-
-  .transform-btn {
-    padding: 8px 10px;
-    font-size: 11px;
-    min-width: 70px;
-  }
-
-  .transform-btn svg {
-    width: 16px;
-    height: 16px;
-  }
-
-  .action-btn {
-    padding: 10px 12px;
-    font-size: 11px;
-    min-width: 75px;
-  }
-
-  .action-btn svg {
-    width: 18px;
-    height: 18px;
-  }
-
-  .preview-piece {
-    transform: scale(0.8);
-  }
-}
-
-@media (max-width: 380px) {
-  .mobile-controls {
-    padding: 6px;
-    gap: 6px;
+  /* Hide piece preview on smaller screens to save space */
+  .mobile-piece-preview {
+    display: none;
   }
 
   .dpad-container {
-    width: 85px;
-    height: 85px;
+    grid-template-columns: repeat(3, 28px);
+    grid-template-rows: repeat(3, 28px);
     gap: 2px;
   }
 
@@ -299,39 +266,113 @@
     height: 14px;
   }
 
-  .position-indicator {
-    font-size: 8px;
-  }
-
   .transform-btn {
-    padding: 7px 8px;
+    padding: 7px 10px;
     font-size: 10px;
-    min-width: 60px;
-    gap: 4px;
+    min-width: 62px;
+    gap: 3px;
   }
 
   .transform-btn svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .action-btn {
+    padding: 8px 12px;
+    font-size: 10px;
+    min-width: 68px;
+    gap: 3px;
+  }
+
+  .action-btn svg {
     width: 14px;
     height: 14px;
   }
 
+  .position-indicator {
+    font-size: 7px;
+  }
+}
+
+@media (max-width: 380px) {
+  .mobile-controls {
+    padding: 5px 6px;
+    gap: 6px;
+  }
+
+  .dpad-container {
+    grid-template-columns: repeat(3, 26px);
+    grid-template-rows: repeat(3, 26px);
+    gap: 1px;
+  }
+
+  .dpad-btn svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .dpad-btn {
+    border-width: 1px;
+  }
+
+  .transform-controls {
+    gap: 3px;
+  }
+
+  .transform-btn {
+    padding: 6px 8px;
+    font-size: 9px;
+    min-width: 55px;
+    gap: 2px;
+  }
+
+  .transform-btn svg {
+    width: 11px;
+    height: 11px;
+  }
+
+  .action-controls {
+    gap: 3px;
+  }
+
   .action-btn {
-    padding: 8px 10px;
-    font-size: 10px;
-    min-width: 65px;
-    gap: 4px;
+    padding: 7px 10px;
+    font-size: 9px;
+    min-width: 60px;
+    gap: 2px;
   }
 
   .action-btn svg {
-    width: 16px;
-    height: 16px;
+    width: 12px;
+    height: 12px;
+  }
+}
+
+/* Very small screens - icons only for transform buttons */
+@media (max-width: 340px) {
+  .mobile-controls {
+    gap: 4px;
+    padding: 4px;
   }
 
-  .preview-piece {
-    transform: scale(0.7);
+  .transform-btn span,
+  .action-btn span {
+    display: none;
   }
 
-  .preview-label {
-    font-size: 8px;
+  .transform-btn {
+    min-width: 36px;
+    padding: 8px;
+  }
+
+  .action-btn {
+    min-width: 40px;
+    padding: 8px;
+  }
+
+  .dpad-container {
+    grid-template-columns: repeat(3, 24px);
+    grid-template-rows: repeat(3, 24px);
   }
 }

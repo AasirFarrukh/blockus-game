@@ -15,20 +15,21 @@
 /* Mobile cell size adjustments */
 @media (max-width: 768px) {
   .board-container {
-    gap: 6px;
+    gap: 5px;
     --cell-size: min(
-      calc((100dvh - 280px) / 20),
+      calc((100dvh - 300px) / 20),
       calc((100vw - 30px) / 20),
       22px
     );
   }
 
-  /* Larger board when in placement mode */
+  /* Larger board when in placement mode - controls take less space */
   .mobile-placement-mode .board-container {
+    gap: 4px;
     --cell-size: min(
-      calc((100dvh - 220px) / 20),
-      calc((100vw - 24px) / 20),
-      24px
+      calc((100dvh - 200px) / 20),
+      calc((100vw - 20px) / 20),
+      26px
     );
   }
 }
@@ -37,16 +38,17 @@
   .board-container {
     gap: 4px;
     --cell-size: min(
-      calc((100dvh - 260px) / 20),
+      calc((100dvh - 280px) / 20),
       calc((100vw - 20px) / 20),
       18px
     );
   }
 
   .mobile-placement-mode .board-container {
+    gap: 3px;
     --cell-size: min(
-      calc((100dvh - 200px) / 20),
-      calc((100vw - 16px) / 20),
+      calc((100dvh - 180px) / 20),
+      calc((100vw - 14px) / 20),
       20px
     );
   }
@@ -54,17 +56,19 @@
 
 @media (max-width: 380px) {
   .board-container {
+    gap: 3px;
     --cell-size: min(
-      calc((100dvh - 240px) / 20),
+      calc((100dvh - 260px) / 20),
       calc((100vw - 14px) / 20),
       15px
     );
   }
 
   .mobile-placement-mode .board-container {
+    gap: 2px;
     --cell-size: min(
-      calc((100dvh - 190px) / 20),
-      calc((100vw - 12px) / 20),
+      calc((100dvh - 170px) / 20),
+      calc((100vw - 10px) / 20),
       17px
     );
   }
@@ -104,12 +108,12 @@
 /* Mobile hint text */
 .mobile-hint {
   display: none;
-  font-size: 11px;
+  font-size: 10px;
   color: var(--text-muted);
   text-align: center;
-  padding: 4px 12px;
+  padding: 3px 10px;
   background: var(--bg-tertiary);
-  border-radius: 12px;
+  border-radius: 10px;
   animation: fadeIn 0.3s ease;
 }
 
@@ -119,9 +123,23 @@
   }
 }
 
+@media (max-width: 480px) {
+  .mobile-hint {
+    font-size: 9px;
+    padding: 2px 8px;
+  }
+}
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+/* Swipe-enabled board styling */
+@media (max-width: 768px) {
+  .board {
+    touch-action: none; /* Prevent default touch behaviors for swipe */
+  }
 }
 
 /* Board wrapper with wooden frame effect */
@@ -464,19 +482,23 @@
 
 @media (max-width: 480px) {
   .current-player-banner {
-    padding: 6px 14px;
-    font-size: 11px;
-    letter-spacing: 1px;
+    padding: 5px 12px;
+    font-size: 10px;
+    letter-spacing: 0.8px;
   }
 
   .board-wrapper {
-    padding: 6px;
-    border-radius: 10px;
+    padding: 5px;
+    border-radius: 8px;
     box-shadow:
-      0 0 0 3px #5c3d2a,
-      0 0 0 5px #2a1a0f,
-      0 6px 20px rgba(0, 0, 0, 0.4),
-      inset 0 1px 3px rgba(255, 255, 255, 0.1);
+      0 0 0 2px #5c3d2a,
+      0 0 0 4px #2a1a0f,
+      0 4px 16px rgba(0, 0, 0, 0.4),
+      inset 0 1px 2px rgba(255, 255, 255, 0.1);
+  }
+
+  .mobile-placement-mode .board-wrapper {
+    padding: 4px;
   }
 
   .coordinate-label {

@@ -69,8 +69,10 @@
   }
 
   .game-layout.mobile-placement-mode .sidebar {
-    max-height: 130px;
-    min-height: 110px;
+    max-height: none;
+    min-height: auto;
+    height: auto;
+    flex-shrink: 0;
   }
 }
 
@@ -86,8 +88,9 @@
   }
 
   .game-layout.mobile-placement-mode .sidebar {
-    max-height: 120px;
-    min-height: 100px;
+    max-height: none;
+    min-height: auto;
+    height: auto;
   }
 }
 
@@ -102,8 +105,9 @@
   }
 
   .game-layout.mobile-placement-mode .sidebar {
-    max-height: 110px;
-    min-height: 95px;
+    max-height: none;
+    min-height: auto;
+    height: auto;
   }
 }
 

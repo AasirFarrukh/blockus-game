@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import './Board.css';
 import { PLAYER_COLORS, COLOR_NAMES, PLAYER_MODES } from '../../data/pieces';
 import { isValidPlacement } from '../../utils/validation';
@@ -20,8 +20,92 @@ const Board = ({
   const [toast, setToast] = useState(null);
   const [placedCells, setPlacedCells] = useState([]);
 
+  // Swipe gesture state
+  const touchStartRef = useRef(null);
+  const lastMoveTimeRef = useRef(0);
+
   // Use mobile position if in mobile mode, otherwise use hover position
   const activePosition = isMobile && selectedPiece ? mobilePosition : hoverPosition;
+
+  // Handle swipe gesture for mobile
+  const handleTouchStart = useCallback((e) => {
+    if (!isMobile || !selectedPiece) return;
+    const touch = e.touches[0];
+    touchStartRef.current = {
+      x: touch.clientX,
+      y: touch.clientY,
+      time: Date.now()
+    };
+  }, [isMobile, selectedPiece]);
+
+  const handleTouchMove = useCallback((e) => {
+    if (!isMobile || !selectedPiece || !touchStartRef.current || !onMobilePositionChange) return;
+
+    // Prevent scrolling while swiping on the board
+    e.preventDefault();
+
+    const touch = e.touches[0];
+    const deltaX = touch.clientX - touchStartRef.current.x;
+    const deltaY = touch.clientY - touchStartRef.current.y;
+
+    // Minimum swipe distance threshold (in pixels)
+    const threshold = 25;
+    const now = Date.now();
+
+    // Throttle moves to prevent too rapid movement (100ms between moves)
+    if (now - lastMoveTimeRef.current < 100) return;
+
+    let moved = false;
+
+    if (Math.abs(deltaX) > threshold || Math.abs(deltaY) > threshold) {
+      // Determine primary direction
+      if (Math.abs(deltaX) > Math.abs(deltaY)) {
+        // Horizontal swipe
+        if (deltaX > threshold) {
+          onMobilePositionChange(prev => ({
+            ...prev,
+            col: Math.min(19, prev.col + 1)
+          }));
+          moved = true;
+        } else if (deltaX < -threshold) {
+          onMobilePositionChange(prev => ({
+            ...prev,
+            col: Math.max(0, prev.col - 1)
+          }));
+          moved = true;
+        }
+      } else {
+        // Vertical swipe
+        if (deltaY > threshold) {
+          onMobilePositionChange(prev => ({
+            ...prev,
+            row: Math.min(19, prev.row + 1)
+          }));
+          moved = true;
+        } else if (deltaY < -threshold) {
+          onMobilePositionChange(prev => ({
+            ...prev,
+            row: Math.max(0, prev.row - 1)
+          }));
+          moved = true;
+        }
+      }
+
+      if (moved) {
+        // Reset start position for continuous swiping
+        touchStartRef.current = {
+          x: touch.clientX,
+          y: touch.clientY,
+          time: now
+        };
+        lastMoveTimeRef.current = now;
+      }
+    }
+  }, [isMobile, selectedPiece, onMobilePositionChange]);
+
+  const handleTouchEnd = useCallback(() => {
+    touchStartRef.current = null;
+  }, []);
 
   // Calculate the center offset of the shape
   const shapeCenter = useMemo(() => {
@@ -217,10 +301,16 @@ const Board = ({
       </div>
       {isMobile && selectedPiece && (
         <div className="mobile-hint">
-          Tap board to move piece
+          Swipe or tap to move piece
         </div>
       )}
-      <div className="board" onMouseLeave={handleMouseLeave}>
+      <div
+        className="board"
+        onMouseLeave={handleMouseLeave}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
         {board.map((row, rowIndex) => (
           <div key={rowIndex} className="board-row">
             {row.map((cell, colIndex) => {
