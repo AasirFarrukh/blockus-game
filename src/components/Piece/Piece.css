@@ -55,3 +55,63 @@
 .piece-cell.empty {
   visibility: hidden;
 }
+
+/* Mobile Piece Styles */
+@media (max-width: 768px) {
+  .piece-container {
+    padding: 5px;
+    min-height: 44px;
+    min-width: 44px;
+    border-radius: var(--radius-sm);
+    border-width: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .piece-container:hover:not(.used) {
+    transform: none;
+  }
+
+  .piece-container:active:not(.used) {
+    transform: scale(0.92);
+    background: var(--bg-secondary);
+    border-color: var(--player-blue);
+  }
+
+  .piece-container.selected {
+    transform: scale(1.05);
+  }
+
+  .piece-cell {
+    width: 7px;
+    height: 7px;
+  }
+}
+
+@media (max-width: 480px) {
+  .piece-container {
+    padding: 4px;
+    min-height: 40px;
+    min-width: 40px;
+    border-width: 1.5px;
+  }
+
+  .piece-cell {
+    width: 6px;
+    height: 6px;
+  }
+}
+
+@media (max-width: 380px) {
+  .piece-container {
+    padding: 3px;
+    min-height: 36px;
+    min-width: 36px;
+  }
+
+  .piece-cell {
+    width: 5px;
+    height: 5px;
+  }
+}

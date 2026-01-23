@@ -629,3 +629,180 @@
     padding: 10px;
   }
 }
+
+@media (max-width: 480px) {
+  .top-menu {
+    padding: 8px;
+    gap: 8px;
+  }
+
+  .top-menu-scores {
+    gap: 6px;
+  }
+
+  .top-menu-actions {
+    padding-bottom: 8px;
+    gap: 6px;
+  }
+
+  .player-score-card {
+    min-width: 70px;
+    max-width: 85px;
+    padding: 5px 8px;
+  }
+
+  .player-score-header {
+    margin-bottom: 2px;
+    gap: 5px;
+  }
+
+  .player-color-dot {
+    width: 10px;
+    height: 10px;
+  }
+
+  .player-score-name {
+    font-size: 10px;
+  }
+
+  .out-badge {
+    font-size: 7px;
+    padding: 1px 4px;
+    margin-left: 3px;
+  }
+
+  .score-stat {
+    gap: 2px;
+  }
+
+  .score-value {
+    font-size: 13px;
+  }
+
+  .score-stat.pieces .score-value {
+    font-size: 12px;
+  }
+
+  .score-label {
+    font-size: 8px;
+  }
+
+  .piece-progress-bar {
+    margin-top: 4px;
+    height: 3px;
+  }
+
+  .menu-btn {
+    padding: 8px;
+    min-width: 36px;
+    min-height: 36px;
+  }
+
+  .menu-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .icon-btn {
+    padding: 8px;
+  }
+
+  .menu-divider {
+    height: 20px;
+    margin: 0 4px;
+  }
+
+  /* Pause Modal Mobile */
+  .pause-modal {
+    min-width: auto;
+    width: calc(100% - 30px);
+    max-width: 320px;
+    padding: 24px 20px;
+  }
+
+  .pause-modal-header h2 {
+    font-size: 20px;
+    letter-spacing: 1.5px;
+  }
+
+  .pause-modal-btn {
+    padding: 14px 20px;
+    font-size: 14px;
+  }
+
+  .pause-modal.instructions-view {
+    min-width: auto;
+    max-width: 340px;
+  }
+
+  .instruction-item {
+    padding: 10px 12px;
+    gap: 10px;
+  }
+
+  .instruction-num {
+    width: 22px;
+    height: 22px;
+    font-size: 11px;
+  }
+
+  .instruction-text strong {
+    font-size: 12px;
+  }
+
+  .instruction-text p {
+    font-size: 11px;
+  }
+
+  .controls-info {
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .control-hint {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 380px) {
+  .top-menu {
+    padding: 6px;
+  }
+
+  .player-score-card {
+    min-width: 60px;
+    max-width: 75px;
+    padding: 4px 6px;
+  }
+
+  .player-score-name {
+    font-size: 9px;
+  }
+
+  .score-value {
+    font-size: 12px;
+  }
+
+  .score-stat.pieces .score-value {
+    font-size: 11px;
+  }
+
+  .score-label {
+    font-size: 7px;
+  }
+
+  .player-score-stats {
+    gap: 8px;
+  }
+
+  .menu-btn {
+    padding: 6px;
+    min-width: 32px;
+    min-height: 32px;
+  }
+
+  .icon-btn {
+    padding: 6px;
+  }
+}

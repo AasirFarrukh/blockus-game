@@ -1,11 +1,14 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import './App.css';
 import Board from './components/Board/Board';
 import PieceSelector from './components/PieceSelector/PieceSelector';
+import MobileControls from './components/MobileControls/MobileControls';
 import TopMenu from './components/TopMenu/TopMenu';
 import StartScreen from './components/StartScreen/StartScreen';
 import { useGameState } from './hooks/useGameState';
+import { isValidPlacement } from './utils/validation';
 import { PLAYER_NAMES, PIECE_SHAPES, PLAYER_MODES, PLAYER_COLORS } from './data/pieces';
+import { rotatePiece, flipPiece } from './utils/gameLogic';
 
 // Sound effects using Web Audio API
 const createSoundEffects = () => {
@@ -53,11 +56,34 @@ const createSoundEffects = () => {
 
 let sounds = null;
 
+// Hook to detect mobile screen
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  return isMobile;
+};
+
 function App() {
   const [gameStarted, setGameStarted] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [selectedPlayerCount, setSelectedPlayerCount] = useState(4);
+
+  // Mobile-specific state
+  const isMobile = useIsMobile();
+  const [mobilePosition, setMobilePosition] = useState({ row: 10, col: 10 });
+
+  // Rotation/flip state (needed for mobile controls)
+  const [rotation, setRotation] = useState(0);
+  const [flipped, setFlipped] = useState(false);
 
   const {
     board,
@@ -156,9 +182,17 @@ function App() {
   const handleSelectPiece = (piece) => {
     if (piece && sounds && soundEnabled) sounds.select();
     else if (!piece && sounds && soundEnabled) sounds.deselect();
+
+    // Reset rotation state when selecting a new piece or deselecting
+    if (!piece || (piece && selectedPiece?.id !== piece.id)) {
+      setRotation(0);
+      setFlipped(false);
+    }
+
     setSelectedPiece(piece);
   };
 
+  // Desktop rotate/flip - just play sounds (PieceSelector handles the actual transformation)
   const handleRotate = useCallback(() => {
     if (sounds && soundEnabled) sounds.rotate();
   }, [soundEnabled]);
@@ -166,6 +200,161 @@ function App() {
   const handleFlip = useCallback(() => {
     if (sounds && soundEnabled) sounds.flip();
   }, [soundEnabled]);
+
+  // Mobile rotate - does the actual transformation
+  const handleMobileRotate = useCallback(() => {
+    if (!selectedPiece) return;
+
+    const newRotation = (rotation + 1) % 4;
+    setRotation(newRotation);
+
+    // Apply transformations
+    let transformedShape = selectedPiece.originalShape;
+    if (flipped) {
+      transformedShape = flipPiece(transformedShape);
+    }
+    for (let i = 0; i < newRotation; i++) {
+      transformedShape = rotatePiece(transformedShape);
+    }
+
+    setSelectedPiece({
+      ...selectedPiece,
+      shape: transformedShape
+    });
+
+    if (sounds && soundEnabled) sounds.rotate();
+  }, [selectedPiece, rotation, flipped, setSelectedPiece, soundEnabled]);
+
+  // Mobile flip - does the actual transformation
+  const handleMobileFlip = useCallback(() => {
+    if (!selectedPiece) return;
+
+    const newFlipped = !flipped;
+    setFlipped(newFlipped);
+
+    // Apply transformations
+    let transformedShape = selectedPiece.originalShape;
+    if (newFlipped) {
+      transformedShape = flipPiece(transformedShape);
+    }
+    for (let i = 0; i < rotation; i++) {
+      transformedShape = rotatePiece(transformedShape);
+    }
+
+    setSelectedPiece({
+      ...selectedPiece,
+      shape: transformedShape
+    });
+
+    if (sounds && soundEnabled) sounds.flip();
+  }, [selectedPiece, rotation, flipped, setSelectedPiece, soundEnabled]);
+
+  // Mobile: Move piece position
+  const handleMobileMove = useCallback((direction) => {
+    setMobilePosition(prev => {
+      const newPos = { ...prev };
+      switch (direction) {
+        case 'up':
+          newPos.row = Math.max(0, prev.row - 1);
+          break;
+        case 'down':
+          newPos.row = Math.min(19, prev.row + 1);
+          break;
+        case 'left':
+          newPos.col = Math.max(0, prev.col - 1);
+          break;
+        case 'right':
+          newPos.col = Math.min(19, prev.col + 1);
+          break;
+        default:
+          break;
+      }
+      return newPos;
+    });
+  }, []);
+
+  // Mobile: Calculate shape center offset
+  const shapeCenter = useMemo(() => {
+    if (!selectedPiece) return { rowOffset: 0, colOffset: 0 };
+
+    const { shape } = selectedPiece;
+    const filledCells = [];
+    for (let r = 0; r < shape.length; r++) {
+      for (let c = 0; c < shape[0].length; c++) {
+        if (shape[r][c] === 1) {
+          filledCells.push({ r, c });
+        }
+      }
+    }
+
+    const avgRow = filledCells.reduce((sum, cell) => sum + cell.r, 0) / filledCells.length;
+    const avgCol = filledCells.reduce((sum, cell) => sum + cell.c, 0) / filledCells.length;
+
+    return {
+      rowOffset: Math.floor(avgRow),
+      colOffset: Math.floor(avgCol)
+    };
+  }, [selectedPiece]);
+
+  // Mobile: Check if current position is valid
+  const isMobilePlacementValid = useMemo(() => {
+    if (!selectedPiece || !isMobile) return false;
+
+    const placementRow = mobilePosition.row - shapeCenter.rowOffset;
+    const placementCol = mobilePosition.col - shapeCenter.colOffset;
+
+    const result = isValidPlacement(
+      board,
+      placementRow,
+      placementCol,
+      selectedPiece.shape,
+      currentPlayer,
+      firstMoves[currentPlayer]
+    );
+
+    return result.valid;
+  }, [selectedPiece, isMobile, mobilePosition, shapeCenter, board, currentPlayer, firstMoves]);
+
+  // Mobile: Place piece at current position
+  const handleMobilePlace = useCallback(() => {
+    if (!selectedPiece || !isMobilePlacementValid) return;
+
+    const placementRow = mobilePosition.row - shapeCenter.rowOffset;
+    const placementCol = mobilePosition.col - shapeCenter.colOffset;
+
+    const result = placePiece(placementRow, placementCol, selectedPiece.shape, selectedPiece.id);
+    if (result && result.success) {
+      if (sounds && soundEnabled) sounds.place();
+      // Reset position to center for next piece
+      setMobilePosition({ row: 10, col: 10 });
+    } else if (result && !result.success) {
+      if (sounds && soundEnabled) sounds.invalid();
+    }
+  }, [selectedPiece, isMobilePlacementValid, mobilePosition, shapeCenter, placePiece, soundEnabled]);
+
+  // Mobile: Cancel selection
+  const handleMobileCancel = useCallback(() => {
+    setSelectedPiece(null);
+    if (sounds && soundEnabled) sounds.deselect();
+  }, [setSelectedPiece, soundEnabled]);
+
+  // Reset mobile position when piece changes
+  useEffect(() => {
+    if (selectedPiece && isMobile) {
+      // Start near the player's corner for first moves
+      if (firstMoves[currentPlayer]) {
+        const corners = [
+          { row: 2, col: 2 },      // Blue - top left
+          { row: 2, col: 17 },     // Red - top right
+          { row: 17, col: 17 },    // Green - bottom right
+          { row: 17, col: 2 }      // Yellow - bottom left
+        ];
+        setMobilePosition(corners[currentPlayer]);
+      } else {
+        setMobilePosition({ row: 10, col: 10 });
+      }
+    }
+  }, [selectedPiece, isMobile, currentPlayer, firstMoves]);
 
   const handleUndo = () => {
     if (undoMove()) {
@@ -316,7 +505,7 @@ function App() {
         isNeutralColor={isNeutralColor}
       />
 
-      <div className="game-layout">
+      <div className={`game-layout ${isMobile && selectedPiece ? 'mobile-placement-mode' : ''}`}>
         <div className="main-area">
           <Board
             board={board}
@@ -327,18 +516,36 @@ function App() {
             playerCount={playerCount}
             neutralTurnPlayer={neutralTurnPlayer}
             isNeutralColor={isNeutralColor}
+            isMobile={isMobile}
+            mobilePosition={mobilePosition}
+            onMobilePositionChange={setMobilePosition}
           />
         </div>
 
         <div className="sidebar right-sidebar">
-          <PieceSelector
-            currentPlayer={currentPlayer}
-            usedPieces={usedPieces}
-            selectedPiece={selectedPiece}
-            onSelectPiece={handleSelectPiece}
-            onRotate={handleRotate}
-            onFlip={handleFlip}
-          />
+          {/* On mobile, show controls when piece is selected, otherwise show piece selector */}
+          {isMobile && selectedPiece ? (
+            <MobileControls
+              selectedPiece={selectedPiece}
+              currentPlayer={currentPlayer}
+              position={mobilePosition}
+              onMove={handleMobileMove}
+              onRotate={handleMobileRotate}
+              onFlip={handleMobileFlip}
+              onPlace={handleMobilePlace}
+              onCancel={handleMobileCancel}
+              isValidPlacement={isMobilePlacementValid}
+            />
+          ) : (
+            <PieceSelector
+              currentPlayer={currentPlayer}
+              usedPieces={usedPieces}
+              selectedPiece={selectedPiece}
+              onSelectPiece={handleSelectPiece}
+              onRotate={handleRotate}
+              onFlip={handleFlip}
+            />
+          )}
         </div>
       </div>
     </div>

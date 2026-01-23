@@ -98,3 +98,56 @@ body {
 code {
   font-family: 'Fira Code', source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
+
+/* Mobile-specific global styles */
+@media (max-width: 768px) {
+  /* Improve touch targets */
+  button,
+  [role="button"],
+  .piece-container {
+    touch-action: manipulation;
+  }
+
+  /* Prevent text selection on interactive elements */
+  .board-cell,
+  .piece-container,
+  .menu-btn,
+  .player-count-btn {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Smoother scrolling */
+  .pieces-grid,
+  .start-screen {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Thinner scrollbars on mobile */
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+}
+
+/* Safe area support for devices with notches */
+@supports (padding: max(0px)) {
+  .App {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .top-menu {
+    padding-top: max(12px, env(safe-area-inset-top));
+  }
+}
+
+@media (max-width: 480px) {
+  @supports (padding: max(0px)) {
+    .top-menu {
+      padding-top: max(8px, env(safe-area-inset-top));
+    }
+  }
+}

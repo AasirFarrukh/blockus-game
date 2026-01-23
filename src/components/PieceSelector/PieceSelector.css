@@ -139,3 +139,97 @@
   margin-right: -2px;
   padding-right: 8px;
 }
+
+/* Mobile PieceSelector Styles */
+@media (max-width: 768px) {
+  .piece-selector {
+    padding: 8px;
+    border-radius: var(--radius-md);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .piece-selector h3 {
+    font-size: 10px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .piece-selector h3::after {
+    content: '(Tap to select)';
+    font-size: 9px;
+    color: var(--text-muted);
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  /* Hide desktop controls on mobile - we use MobileControls instead */
+  .piece-controls {
+    display: none;
+  }
+
+  .rotation-info {
+    display: none;
+  }
+
+  .keyboard-hints {
+    display: none;
+  }
+
+  .pieces-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 4px;
+    margin: 0;
+    flex: 1;
+    min-height: 0;
+    align-content: flex-start;
+  }
+
+  .pieces-grid > * {
+    flex: 0 0 auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .piece-selector {
+    padding: 6px;
+  }
+
+  .piece-selector h3 {
+    font-size: 9px;
+    margin-bottom: 4px;
+  }
+
+  .piece-selector h3::after {
+    font-size: 8px;
+  }
+
+  .pieces-grid {
+    gap: 4px;
+    padding: 2px;
+  }
+}
+
+@media (max-width: 380px) {
+  .piece-selector h3 {
+    font-size: 8px;
+  }
+
+  .piece-selector h3::after {
+    display: none;
+  }
+
+  .pieces-grid {
+    gap: 3px;
+  }
+}

@@ -11,11 +11,17 @@ const Board = ({
   onPlacePiece,
   playerCount = 4,
   neutralTurnPlayer = 0,
-  isNeutralColor
+  isNeutralColor,
+  isMobile = false,
+  mobilePosition = null,
+  onMobilePositionChange = null
 }) => {
   const [hoverPosition, setHoverPosition] = useState(null);
   const [toast, setToast] = useState(null);
   const [placedCells, setPlacedCells] = useState([]);
+
+  // Use mobile position if in mobile mode, otherwise use hover position
+  const activePosition = isMobile && selectedPiece ? mobilePosition : hoverPosition;
 
   // Calculate the center offset of the shape
   const shapeCenter = useMemo(() => {
@@ -47,10 +53,10 @@ const Board = ({
 
   // Check if current preview position is valid
   const previewValid = useMemo(() => {
-    if (!hoverPosition || !selectedPiece) return false;
+    if (!activePosition || !selectedPiece) return false;
 
-    const placementRow = hoverPosition.row - shapeCenter.rowOffset;
-    const placementCol = hoverPosition.col - shapeCenter.colOffset;
+    const placementRow = activePosition.row - shapeCenter.rowOffset;
+    const placementCol = activePosition.col - shapeCenter.colOffset;
 
     const result = isValidPlacement(
       board,
@@ -62,7 +68,7 @@ const Board = ({
     );
 
     return result.valid;
-  }, [hoverPosition, selectedPiece, board, currentPlayer, firstMoves, shapeCenter]);
+  }, [activePosition, selectedPiece, board, currentPlayer, firstMoves, shapeCenter]);
 
   // Show toast notification
   const showToast = (message) => {
@@ -91,7 +97,13 @@ const Board = ({
 
   const handleCellClick = (row, col) => {
     if (selectedPiece) {
-      // Adjust placement position to account for center offset
+      // On mobile, tapping a cell moves the piece to that position
+      if (isMobile && onMobilePositionChange) {
+        onMobilePositionChange({ row, col });
+        return;
+      }
+
+      // On desktop, clicking places the piece
       const placementRow = row - shapeCenter.rowOffset;
       const placementCol = col - shapeCenter.colOffset;
       const result = onPlacePiece(placementRow, placementCol, selectedPiece.shape, selectedPiece.id);
@@ -124,16 +136,16 @@ const Board = ({
     setHoverPosition(null);
   };
 
-  // Check if a cell should show preview (centered on cursor)
+  // Check if a cell should show preview (centered on cursor or mobile position)
   const isPreviewCell = (row, col) => {
-    if (!hoverPosition || !selectedPiece) return false;
+    if (!activePosition || !selectedPiece) return false;
 
-    const { row: hoverRow, col: hoverCol } = hoverPosition;
+    const { row: activeRow, col: activeCol } = activePosition;
     const { shape } = selectedPiece;
 
-    // Adjust for center offset - the hover position should be the center of the shape
-    const shapeStartRow = hoverRow - shapeCenter.rowOffset;
-    const shapeStartCol = hoverCol - shapeCenter.colOffset;
+    // Adjust for center offset - the active position should be the center of the shape
+    const shapeStartRow = activeRow - shapeCenter.rowOffset;
+    const shapeStartCol = activeCol - shapeCenter.colOffset;
 
     const relativeRow = row - shapeStartRow;
     const relativeCol = col - shapeStartCol;
@@ -203,6 +215,11 @@ const Board = ({
       >
         <span className="banner-text">{getBannerText()}</span>
       </div>
+      {isMobile && selectedPiece && (
+        <div className="mobile-hint">
+          Tap board to move piece
+        </div>
+      )}
       <div className="board" onMouseLeave={handleMouseLeave}>
         {board.map((row, rowIndex) => (
           <div key={rowIndex} className="board-row">

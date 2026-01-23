@@ -1,5 +1,6 @@
 .App {
   height: 100vh;
+  height: 100dvh; /* Dynamic viewport height for mobile */
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -35,6 +36,75 @@
 /* Hide left sidebar - only right sidebar remains */
 .left-sidebar {
   display: none;
+}
+
+/* Mobile Layout - Stack vertically */
+@media (max-width: 768px) {
+  .game-layout {
+    flex-direction: column;
+    padding: 8px;
+    gap: 8px;
+    overflow: hidden;
+  }
+
+  .main-area {
+    flex: 1;
+    min-height: 0;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .sidebar {
+    width: 100%;
+    flex-shrink: 0;
+    max-height: 35vh;
+    min-height: 140px;
+    overflow: hidden;
+  }
+
+  /* Mobile Placement Mode - Larger board, compact controls */
+  .game-layout.mobile-placement-mode .main-area {
+    flex: 1;
+  }
+
+  .game-layout.mobile-placement-mode .sidebar {
+    max-height: 130px;
+    min-height: 110px;
+  }
+}
+
+@media (max-width: 480px) {
+  .game-layout {
+    padding: 6px;
+    gap: 6px;
+  }
+
+  .sidebar {
+    max-height: 32vh;
+    min-height: 130px;
+  }
+
+  .game-layout.mobile-placement-mode .sidebar {
+    max-height: 120px;
+    min-height: 100px;
+  }
+}
+
+@media (max-width: 380px) {
+  .game-layout {
+    padding: 4px;
+    gap: 4px;
+  }
+
+  .sidebar {
+    min-height: 120px;
+  }
+
+  .game-layout.mobile-placement-mode .sidebar {
+    max-height: 110px;
+    min-height: 95px;
+  }
 }
 
 /* Game Over Modal */
@@ -209,4 +279,53 @@
 .modal-buttons button.secondary:hover {
   background: var(--border-default);
   transform: translateY(-2px);
+}
+
+/* Mobile Game Over Modal */
+@media (max-width: 480px) {
+  .game-over-modal {
+    min-width: auto;
+    width: calc(100% - 40px);
+    max-width: 350px;
+    padding: 25px 20px;
+  }
+
+  .game-over-modal h2 {
+    font-size: 22px;
+    margin-bottom: 18px;
+  }
+
+  .score-row {
+    padding: 10px 12px;
+    margin: 6px 0;
+  }
+
+  .rank {
+    font-size: 16px;
+    width: 25px;
+  }
+
+  .player-dot {
+    width: 18px;
+    height: 18px;
+  }
+
+  .score-row .player-name {
+    font-size: 13px;
+  }
+
+  .player-score {
+    font-size: 15px;
+  }
+
+  .modal-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .modal-buttons button {
+    padding: 12px 24px;
+    font-size: 14px;
+    width: 100%;
+  }
 }

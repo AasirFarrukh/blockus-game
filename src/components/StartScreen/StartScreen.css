@@ -394,3 +394,205 @@
     gap: 10px;
   }
 }
+
+@media (max-width: 480px) {
+  .start-screen {
+    padding: 20px 12px;
+  }
+
+  .start-content {
+    padding: 20px 15px;
+    border-radius: var(--radius-lg);
+  }
+
+  .start-title {
+    font-size: 36px;
+    letter-spacing: 4px;
+  }
+
+  .start-subtitle {
+    font-size: 14px;
+    margin: 8px 0 20px;
+  }
+
+  .instruction-section h2,
+  .controls-section h2,
+  .player-count-section h2 {
+    font-size: 14px;
+    margin-bottom: 12px;
+  }
+
+  .instruction-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .instruction-card {
+    padding: 14px;
+    padding-left: 18px;
+  }
+
+  .instruction-number {
+    width: 24px;
+    height: 24px;
+    font-size: 12px;
+    top: -8px;
+    left: -8px;
+  }
+
+  .instruction-card h3 {
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+
+  .instruction-card p {
+    font-size: 11px;
+    line-height: 1.4;
+  }
+
+  .controls-section {
+    margin-bottom: 16px;
+  }
+
+  .controls-grid {
+    gap: 8px;
+  }
+
+  .control-item {
+    padding: 6px 10px;
+    gap: 8px;
+  }
+
+  .control-key {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+
+  .control-desc {
+    font-size: 12px;
+  }
+
+  .player-count-section {
+    margin-bottom: 16px;
+  }
+
+  .player-count-options {
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .player-count-btn {
+    width: 75px;
+    height: 68px;
+  }
+
+  .count-number {
+    font-size: 26px;
+  }
+
+  .count-label {
+    font-size: 10px;
+    margin-top: 2px;
+  }
+
+  .mode-description {
+    font-size: 12px;
+    margin-bottom: 10px;
+  }
+
+  .players-preview {
+    padding: 10px;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .player-group {
+    padding: 6px 10px;
+    gap: 4px;
+  }
+
+  .player-group span {
+    font-size: 11px;
+  }
+
+  .player-color {
+    width: 22px;
+    height: 22px;
+  }
+
+  .vs {
+    font-size: 12px;
+  }
+
+  .start-button {
+    padding: 14px 40px;
+    font-size: 16px;
+    letter-spacing: 1.5px;
+  }
+}
+
+@media (max-width: 380px) {
+  .start-screen {
+    padding: 15px 8px;
+  }
+
+  .start-content {
+    padding: 16px 12px;
+  }
+
+  .start-title {
+    font-size: 30px;
+    letter-spacing: 3px;
+  }
+
+  .start-subtitle {
+    font-size: 12px;
+    margin: 6px 0 16px;
+  }
+
+  .instruction-section h2,
+  .controls-section h2,
+  .player-count-section h2 {
+    font-size: 13px;
+    margin-bottom: 10px;
+  }
+
+  .instruction-card {
+    padding: 12px;
+    padding-left: 16px;
+  }
+
+  .controls-grid {
+    display: none;
+  }
+
+  .player-count-options {
+    gap: 8px;
+  }
+
+  .player-count-btn {
+    width: 65px;
+    height: 60px;
+  }
+
+  .count-number {
+    font-size: 22px;
+  }
+
+  .count-label {
+    font-size: 9px;
+  }
+
+  .player-color {
+    width: 20px;
+    height: 20px;
+  }
+
+  .start-button {
+    padding: 12px 30px;
+    font-size: 14px;
+    width: 100%;
+    max-width: 240px;
+  }
+}
