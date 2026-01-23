@@ -112,10 +112,10 @@ export const PIECE_SHAPES = {
 };
 
 export const PLAYER_COLORS = {
-  0: '#3B82F6', // Blue
-  1: '#EF4444', // Red
-  2: '#10B981', // Green
-  3: '#F59E0B'  // Yellow/Orange
+  0: '#0066CB', // Blue (from Blokus logo)
+  1: '#CC0001', // Red (from Blokus logo)
+  2: '#019934', // Green (from Blokus logo)
+  3: '#FFCC01'  // Yellow (from Blokus logo)
 };
 
 export const COLOR_NAMES = {

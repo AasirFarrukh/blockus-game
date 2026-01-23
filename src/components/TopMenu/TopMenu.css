@@ -233,7 +233,7 @@
 
 .undo-btn:hover:not(.disabled) {
   background: linear-gradient(135deg, var(--btn-warning-hover) 0%, #c88508 100%);
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
 }
 
 .undo-btn.disabled {
@@ -249,7 +249,7 @@
 
 .pass-btn:hover {
   background: linear-gradient(135deg, var(--btn-secondary-hover) 0%, #1d4ed8 100%);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 102, 179, 0.3);
 }
 
 /* Pause/Menu Button */

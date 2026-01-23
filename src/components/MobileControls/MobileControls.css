@@ -217,7 +217,7 @@
 }
 
 .place-btn.valid {
-  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
+  box-shadow: 0 2px 8px rgba(0, 167, 74, 0.4);
 }
 
 .place-btn.invalid {

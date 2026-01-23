@@ -7,15 +7,15 @@
   --bg-card: #ffffff;
   --bg-card-hover: #f8fafc;
 
-  /* Button Colors - Solid, function based */
-  --btn-primary: #10B981; /* Green - positive actions */
-  --btn-primary-hover: #059669;
-  --btn-secondary: #3B82F6; /* Blue - neutral actions */
-  --btn-secondary-hover: #2563EB;
-  --btn-danger: #EF4444; /* Red - destructive actions */
-  --btn-danger-hover: #DC2626;
-  --btn-warning: #F59E0B; /* Yellow - warning actions */
-  --btn-warning-hover: #D97706;
+  /* Button Colors - Matching Blokus logo theme */
+  --btn-primary: #00A74A; /* Green - positive actions */
+  --btn-primary-hover: #008F3E;
+  --btn-secondary: #0066B3; /* Blue - neutral actions */
+  --btn-secondary-hover: #00549A;
+  --btn-danger: #D52B1E; /* Red - destructive actions */
+  --btn-danger-hover: #B8241A;
+  --btn-warning: #FFC107; /* Yellow - warning actions */
+  --btn-warning-hover: #E5AD06;
   --btn-neutral: #64748b;
   --btn-neutral-hover: #475569;
 
@@ -28,11 +28,11 @@
   --border-default: #e2e8f0;
   --border-hover: #cbd5e1;
 
-  /* Player Colors */
-  --player-blue: #3B82F6;
-  --player-red: #EF4444;
-  --player-green: #10B981;
-  --player-yellow: #F59E0B;
+  /* Player Colors - Matching Blokus logo */
+  --player-blue: #0066CB;
+  --player-red: #CC0001;
+  --player-green: #019934;
+  --player-yellow: #FFCC01;
 
   /* Shadows */
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -91,7 +91,7 @@ body {
 
 /* Selection styling */
 ::selection {
-  background: rgba(59, 130, 246, 0.2);
+  background: rgba(0, 102, 179, 0.2);
   color: var(--text-primary);
 }
 

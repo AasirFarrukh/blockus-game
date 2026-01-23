@@ -330,7 +330,7 @@ const Board = ({
                       : isPreview
                       ? previewValid
                         ? `${PLAYER_COLORS[currentPlayer]}99`
-                        : 'rgba(239, 68, 68, 0.5)'
+                        : 'rgba(213, 43, 30, 0.5)'
                       : undefined
                   }}
                   onClick={() => handleCellClick(rowIndex, colIndex)}
