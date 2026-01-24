@@ -26,7 +26,6 @@
   border: 2px solid transparent;
   transition: all var(--transition-fast);
   min-width: 110px;
-  overflow: hidden;
 }
 
 .player-score-card.active {
@@ -117,7 +116,6 @@
 .player-score-stats {
   display: flex;
   gap: 12px;
-  overflow: hidden;
 }
 
 .score-stat {
@@ -620,7 +618,7 @@
   .player-score-card {
     flex: 1;
     min-width: 80px;
-    max-width: 100px;
+    max-width: none;
   }
 
   .menu-btn span {
@@ -649,7 +647,7 @@
 
   .player-score-card {
     min-width: 70px;
-    max-width: 85px;
+    max-width: none;
     padding: 5px 8px;
   }
 
@@ -665,27 +663,20 @@
 
   .player-score-name {
     font-size: 10px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
   }
 
   .out-badge {
     font-size: 7px;
     padding: 1px 4px;
     margin-left: 3px;
-    flex-shrink: 0;
   }
 
   .score-stat {
     gap: 2px;
-    min-width: 0;
-    flex-shrink: 1;
   }
 
   .score-value {
     font-size: 13px;
-    flex-shrink: 0;
   }
 
   .score-stat.pieces .score-value {
@@ -694,14 +685,10 @@
 
   .score-label {
     font-size: 8px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
   }
 
   .player-score-stats {
     gap: 6px;
-    flex-wrap: nowrap;
   }
 
   .piece-progress-bar {
@@ -788,9 +775,9 @@
   }
 
   .player-score-card {
-    min-width: 60px;
-    max-width: 75px;
-    padding: 4px 6px;
+    min-width: 55px;
+    max-width: none;
+    padding: 4px 5px;
   }
 
   .player-score-name {
@@ -798,15 +785,15 @@
   }
 
   .score-value {
-    font-size: 12px;
-  }
-
-  .score-stat.pieces .score-value {
     font-size: 11px;
   }
 
+  .score-stat.pieces .score-value {
+    font-size: 10px;
+  }
+
   .score-label {
-    font-size: 7px;
+    font-size: 6px;
   }
 
   .player-score-stats {
