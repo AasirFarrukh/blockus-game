@@ -26,6 +26,7 @@
   border: 2px solid transparent;
   transition: all var(--transition-fast);
   min-width: 110px;
+  overflow: hidden;
 }
 
 .player-score-card.active {
@@ -116,6 +117,7 @@
 .player-score-stats {
   display: flex;
   gap: 12px;
+  overflow: hidden;
 }
 
 .score-stat {
@@ -663,20 +665,27 @@
 
   .player-score-name {
     font-size: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .out-badge {
     font-size: 7px;
     padding: 1px 4px;
     margin-left: 3px;
+    flex-shrink: 0;
   }
 
   .score-stat {
     gap: 2px;
+    min-width: 0;
+    flex-shrink: 1;
   }
 
   .score-value {
     font-size: 13px;
+    flex-shrink: 0;
   }
 
   .score-stat.pieces .score-value {
@@ -685,6 +694,14 @@
 
   .score-label {
     font-size: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .player-score-stats {
+    gap: 6px;
+    flex-wrap: nowrap;
   }
 
   .piece-progress-bar {
@@ -793,7 +810,11 @@
   }
 
   .player-score-stats {
-    gap: 8px;
+    gap: 4px;
+  }
+
+  .score-stat {
+    gap: 1px;
   }
 
   .menu-btn {
