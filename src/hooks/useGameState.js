@@ -1,6 +1,7 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { PIECE_SHAPES, PLAYER_MODES } from '../data/pieces';
 import { isValidPlacement } from '../utils/validation';
+import { generateAIMove, getAIThinkingTime } from '../ai/AIController';
 
 // Check if a color has any valid moves
 const hasValidMoves = (board, colorId, usedPieces, isFirstMove) => {
@@ -38,14 +39,34 @@ const hasValidMoves = (board, colorId, usedPieces, isFirstMove) => {
   return false;
 };
 
-export const useGameState = (initialPlayerCount = 4) => {
+export const useGameState = (initialPlayerCount = 4, gameConfig = null) => {
   const [playerCount, setPlayerCount] = useState(initialPlayerCount);
+
+  // Player types: 'human' or 'cpu'
+  const [playerTypes, setPlayerTypes] = useState({
+    0: 'human',
+    1: 'human',
+    2: 'human',
+    3: 'human'
+  });
+
+  // CPU difficulty for all CPU players
+  const [cpuDifficulty, setCpuDifficulty] = useState('medium');
+
+  // Custom player names
+  const [playerNames, setPlayerNames] = useState(null);
+
   // Initialize 20x20 board with null values
   const [board, setBoard] = useState(
     Array(20).fill().map(() => Array(20).fill(null))
   );
 
   const [currentPlayer, setCurrentPlayer] = useState(0);
+
+  // AI processing state
+  const aiTimeoutRef = useRef(null);
+  const lastMoveTimeRef = useRef(0);
+  const previousPlayerTypeRef = useRef('human');
 
   // Track which pieces each player has used
   const [usedPieces, setUsedPieces] = useState({
@@ -251,10 +272,68 @@ export const useGameState = (initialPlayerCount = 4) => {
   }, [board, currentPlayer, firstMoves, usedPieces, playersOut, neutralTurnPlayer, findNextPlayer]);
 
   // Reset game
-  const resetGame = useCallback((newPlayerCount) => {
-    if (newPlayerCount) {
-      setPlayerCount(newPlayerCount);
+  const resetGame = useCallback((config) => {
+    // Clear any pending AI timeouts
+    if (aiTimeoutRef.current) {
+      clearTimeout(aiTimeoutRef.current);
+      aiTimeoutRef.current = null;
     }
+
+    // Handle both old (number) and new (config object) formats
+    let newPlayerCount = playerCount;
+    let newPlayerTypes = { 0: 'human', 1: 'human', 2: 'human', 3: 'human' };
+    let newDifficulty = 'medium';
+    let newPlayerNames = null;
+
+    if (typeof config === 'number') {
+      newPlayerCount = config;
+    } else if (config && typeof config === 'object') {
+      newPlayerCount = config.playerCount || 4;
+
+      if (config.gameMode === 'cpu') {
+        // Set up player types based on human player count and game mode
+        const humanCount = config.humanPlayerCount || 1;
+        newDifficulty = config.cpuDifficulty || 'medium';
+
+        if (newPlayerCount === 2) {
+          // 2-player mode: Player 0 controls colors 0&2, Player 1 controls colors 1&3
+          // If humanCount = 1: Player 0 (human) gets colors 0&2, Player 1 (CPU) gets colors 1&3
+          // If humanCount = 2: Both players are human
+          const player0IsHuman = humanCount >= 1;
+          const player1IsHuman = humanCount >= 2;
+
+          newPlayerTypes[0] = player0IsHuman ? 'human' : 'cpu'; // Blue (Player 0)
+          newPlayerTypes[2] = player0IsHuman ? 'human' : 'cpu'; // Green (Player 0)
+          newPlayerTypes[1] = player1IsHuman ? 'human' : 'cpu'; // Red (Player 1)
+          newPlayerTypes[3] = player1IsHuman ? 'human' : 'cpu'; // Yellow (Player 1)
+        } else if (newPlayerCount === 3) {
+          // 3-player mode: Colors 0,1,2 map to players 0,1,2; Color 3 is neutral
+          // Neutral color is always controlled by whoever's turn it is
+          for (let i = 0; i < 3; i++) {
+            newPlayerTypes[i] = i < humanCount ? 'human' : 'cpu';
+          }
+          newPlayerTypes[3] = 'human'; // Neutral is controlled by current player
+        } else {
+          // 4-player mode: Direct 1:1 mapping
+          for (let i = 0; i < 4; i++) {
+            newPlayerTypes[i] = i < humanCount ? 'human' : 'cpu';
+          }
+        }
+      }
+
+      // Store custom player names if provided
+      if (config.playerNames && Array.isArray(config.playerNames)) {
+        const filteredNames = config.playerNames.filter(name => name && name.trim());
+        if (filteredNames.length > 0) {
+          newPlayerNames = config.playerNames;
+        }
+      }
+    }
+
+    setPlayerCount(newPlayerCount);
+    setPlayerTypes(newPlayerTypes);
+    setCpuDifficulty(newDifficulty);
+    setPlayerNames(newPlayerNames);
     setBoard(Array(20).fill().map(() => Array(20).fill(null)));
     setCurrentPlayer(0);
     setUsedPieces({ 0: [], 1: [], 2: [], 3: [] });
@@ -264,7 +343,99 @@ export const useGameState = (initialPlayerCount = 4) => {
     setGameOver(false);
     setHistory([]);
     setNeutralTurnPlayer(0);
-  }, []);
+  }, [playerCount]);
+
+  // AI move trigger
+  useEffect(() => {
+    // Determine if current turn should be controlled by AI
+    let shouldAIPlay = false;
+
+    if (playerCount === 3 && currentPlayer === PLAYER_MODES[3].neutralColor) {
+      // For neutral color in 3-player mode, check the controlling player
+      shouldAIPlay = playerTypes[neutralTurnPlayer] === 'cpu';
+    } else {
+      // For other modes, check the color's player type
+      shouldAIPlay = playerTypes[currentPlayer] === 'cpu';
+    }
+
+    if (shouldAIPlay && !gameOver && !playersOut[currentPlayer]) {
+      // Calculate delay
+      let totalDelay = getAIThinkingTime(cpuDifficulty);
+
+      // Add extra delay if previous player was also CPU (to avoid rapid-fire moves)
+      if (previousPlayerTypeRef.current === 'cpu') {
+        totalDelay += 800; // Add 800ms between consecutive CPU moves
+      }
+
+      aiTimeoutRef.current = setTimeout(() => {
+        // Determine ally and opponent colors based on player mode
+        const mode = PLAYER_MODES[playerCount];
+        let allyColors, opponentColors;
+
+        if (playerCount === 2) {
+          // In 2-player mode, find which player controls current color
+          const actualPlayer = mode.colorToPlayer[currentPlayer];
+          allyColors = mode.playerColors[actualPlayer];
+          const opponentPlayer = actualPlayer === 0 ? 1 : 0;
+          opponentColors = mode.playerColors[opponentPlayer];
+        } else if (playerCount === 3) {
+          // In 3-player mode
+          if (currentPlayer === mode.neutralColor) {
+            // When playing neutral color, it helps the controlling player
+            const controllingPlayer = neutralTurnPlayer;
+            allyColors = [controllingPlayer, currentPlayer]; // Player's color + neutral
+            // Opponents are the other two players
+            opponentColors = [0, 1, 2].filter(p => p !== controllingPlayer);
+          } else {
+            // Playing own color - only that color is ally
+            allyColors = [currentPlayer];
+            // Opponents are other players + neutral (since it rotates between opponents)
+            opponentColors = [0, 1, 2, 3].filter(c => c !== currentPlayer);
+          }
+        } else {
+          // In 4-player mode, simple 1:1
+          allyColors = [currentPlayer];
+          opponentColors = [0, 1, 2, 3].filter(c => c !== currentPlayer);
+        }
+
+        // Generate AI move with mode awareness
+        const aiMove = generateAIMove(
+          board,
+          currentPlayer,
+          usedPieces,
+          firstMoves[currentPlayer],
+          cpuDifficulty,
+          playerCount,
+          allyColors,
+          opponentColors
+        );
+
+        if (aiMove) {
+          // Place the AI's move
+          placePiece(aiMove.row, aiMove.col, aiMove.shape, aiMove.pieceId);
+        } else {
+          // No valid moves, pass turn
+          passTurn();
+        }
+
+        // Update tracking for next turn
+        lastMoveTimeRef.current = Date.now();
+        previousPlayerTypeRef.current = 'cpu';
+        aiTimeoutRef.current = null;
+      }, totalDelay);
+    } else if (!shouldAIPlay) {
+      // Track that previous player was human
+      previousPlayerTypeRef.current = 'human';
+    }
+
+    // Cleanup timeout on unmount or when dependencies change
+    return () => {
+      if (aiTimeoutRef.current) {
+        clearTimeout(aiTimeoutRef.current);
+        aiTimeoutRef.current = null;
+      }
+    };
+  }, [currentPlayer, gameOver, playersOut, playerTypes, cpuDifficulty, board, usedPieces, firstMoves, placePiece, passTurn, playerCount, neutralTurnPlayer]);
 
   return {
     board,
@@ -284,6 +455,8 @@ export const useGameState = (initialPlayerCount = 4) => {
     playerCount,
     neutralTurnPlayer,
     getCurrentPlayer,
-    isNeutralColor
+    isNeutralColor,
+    playerTypes,
+    playerNames
   };
 };

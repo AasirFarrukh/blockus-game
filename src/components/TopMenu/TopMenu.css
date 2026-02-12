@@ -93,6 +93,14 @@
   letter-spacing: 0.5px;
 }
 
+.cpu-badge {
+  font-size: 12px;
+  margin-left: 4px;
+  opacity: 0.9;
+  display: inline-block;
+  transform: translateY(1px);
+}
+
 .neutral-player-badge {
   background: var(--btn-secondary);
   color: white;

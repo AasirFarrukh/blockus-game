@@ -7,7 +7,7 @@ import TopMenu from './components/TopMenu/TopMenu';
 import StartScreen from './components/StartScreen/StartScreen';
 import { useGameState } from './hooks/useGameState';
 import { isValidPlacement } from './utils/validation';
-import { PLAYER_NAMES, PIECE_SHAPES, PLAYER_MODES, PLAYER_COLORS, COLOR_NAMES } from './data/pieces';
+import { PIECE_SHAPES, PLAYER_MODES, PLAYER_COLORS, COLOR_NAMES } from './data/pieces';
 import { rotatePiece, flipPiece } from './utils/gameLogic';
 
 // Sound effects using Web Audio API
@@ -76,6 +76,12 @@ function App() {
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [selectedPlayerCount, setSelectedPlayerCount] = useState(4);
+  const [gameConfig, setGameConfig] = useState({
+    playerCount: 4,
+    gameMode: 'human',
+    humanPlayerCount: 4,
+    cpuDifficulty: null
+  });
 
   // Mobile-specific state
   const isMobile = useIsMobile();
@@ -83,6 +89,9 @@ function App() {
 
   // Skipped players notification
   const [skippedNotification, setSkippedNotification] = useState(null);
+
+  // Early win notification
+  const [showEarlyWinOption, setShowEarlyWinOption] = useState(false);
 
   // Rotation/flip state (needed for mobile controls)
   const [rotation, setRotation] = useState(0);
@@ -98,6 +107,7 @@ function App() {
     placePiece,
     resetGame,
     gameOver,
+    setGameOver,
     undoMove,
     canUndo,
     playersOut,
@@ -105,8 +115,10 @@ function App() {
     playerCount,
     neutralTurnPlayer,
     getCurrentPlayer,
-    isNeutralColor
-  } = useGameState(selectedPlayerCount);
+    isNeutralColor,
+    playerTypes,
+    playerNames
+  } = useGameState(selectedPlayerCount, gameConfig);
 
   // Initialize sounds on first interaction
   useEffect(() => {
@@ -139,9 +151,20 @@ function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedPiece, setSelectedPiece, soundEnabled]);
 
-  const handleStartGame = (count) => {
-    setSelectedPlayerCount(count);
-    resetGame(count);
+  const handleStartGame = (config) => {
+    // Support both old format (just a number) and new format (config object)
+    if (typeof config === 'number') {
+      config = {
+        playerCount: config,
+        gameMode: 'human',
+        humanPlayerCount: config,
+        cpuDifficulty: null
+      };
+    }
+
+    setGameConfig(config);
+    setSelectedPlayerCount(config.playerCount);
+    resetGame(config);
     setGameStarted(true);
   };
 
@@ -196,6 +219,54 @@ function App() {
       return () => clearTimeout(timer);
     }
   }, [skippedNotification]);
+
+  // Calculate score for a single color
+  const calculateColorScore = useCallback((colorId) => {
+    const used = usedPieces[colorId];
+    return used.reduce((total, pieceId) => {
+      const shape = PIECE_SHAPES[pieceId];
+      const squares = shape.flat().filter(cell => cell === 1).length;
+      return total + squares;
+    }, 0);
+  }, [usedPieces]);
+
+  // Check for early win condition (3 players out, remaining player has most points)
+  useEffect(() => {
+    if (gameOver) {
+      setShowEarlyWinOption(false);
+      return;
+    }
+
+    // Count how many players are out
+    const playersOutCount = Object.values(playersOut).filter(isOut => isOut).length;
+
+    if (playersOutCount === 3) {
+      // Find the remaining player
+      const remainingColorId = Object.keys(playersOut).find(id => !playersOut[id]);
+
+      if (remainingColorId !== undefined) {
+        // Calculate scores for all colors
+        const scores = [0, 1, 2, 3].map(colorId => ({
+          colorId,
+          score: calculateColorScore(colorId)
+        }));
+
+        // Check if remaining player has the highest score
+        const remainingScore = scores.find(s => s.colorId === parseInt(remainingColorId)).score;
+        const hasHighestScore = scores.every(s =>
+          s.colorId === parseInt(remainingColorId) || s.score <= remainingScore
+        );
+
+        if (hasHighestScore && remainingScore > 0) {
+          setShowEarlyWinOption(true);
+        } else {
+          setShowEarlyWinOption(false);
+        }
+      }
+    } else {
+      setShowEarlyWinOption(false);
+    }
+  }, [playersOut, gameOver, usedPieces, calculateColorScore]);
 
   const handleSelectPiece = (piece) => {
     if (piece && sounds && soundEnabled) sounds.select();
@@ -384,22 +455,30 @@ function App() {
     passTurn();
   };
 
-  // Calculate score for a single color
-  const calculateColorScore = (colorId) => {
-    const used = usedPieces[colorId];
-    return used.reduce((total, pieceId) => {
-      const shape = PIECE_SHAPES[pieceId];
-      const squares = shape.flat().filter(cell => cell === 1).length;
-      return total + squares;
-    }, 0);
-  };
-
   // Calculate score for a player (combines colors in 2-player mode)
-  const calculatePlayerScore = (playerId) => {
+  const calculatePlayerScore = useCallback((playerId) => {
     const mode = PLAYER_MODES[playerCount];
     const colors = mode.playerColors[playerId];
     return colors.reduce((total, colorId) => total + calculateColorScore(colorId), 0);
-  };
+  }, [playerCount, calculateColorScore]);
+
+  // Get player display name
+  const getPlayerDisplayName = useCallback((playerId) => {
+    // Check if custom names are provided and this player has a custom name
+    if (playerNames && playerNames[playerId] && playerNames[playerId].trim()) {
+      return playerNames[playerId].trim();
+    }
+
+    // Otherwise use default names based on mode
+    if (playerCount === 2) {
+      return `Player ${playerId + 1}`;
+    } else if (playerCount === 3) {
+      return playerId === 'neutral' ? 'Neutral' : `Player ${playerId + 1}`;
+    } else {
+      // For 4-player mode, use color names as default if no custom name
+      return COLOR_NAMES[playerId];
+    }
+  }, [playerCount, playerNames]);
 
   // Get final scores for game over screen
   const getFinalScores = () => {
@@ -409,13 +488,13 @@ function App() {
       // 2-player mode: combine diagonal colors
       scores.push({
         id: 0,
-        name: 'Player 1',
+        name: getPlayerDisplayName(0),
         score: calculatePlayerScore(0),
         colors: [0, 2] // Blue + Green
       });
       scores.push({
         id: 1,
-        name: 'Player 2',
+        name: getPlayerDisplayName(1),
         score: calculatePlayerScore(1),
         colors: [1, 3] // Red + Yellow
       });
@@ -424,7 +503,7 @@ function App() {
       for (let i = 0; i < 3; i++) {
         scores.push({
           id: i,
-          name: `Player ${i + 1}`,
+          name: getPlayerDisplayName(i),
           score: calculatePlayerScore(i),
           colors: [i]
         });
@@ -442,7 +521,7 @@ function App() {
       for (let i = 0; i < 4; i++) {
         scores.push({
           id: i,
-          name: PLAYER_NAMES[i],
+          name: getPlayerDisplayName(i),
           score: calculatePlayerScore(i),
           colors: [i]
         });
@@ -457,7 +536,7 @@ function App() {
   };
 
   const handleReset = () => {
-    resetGame();
+    resetGame(gameConfig);
   };
 
   const handleBackToMenu = () => {
@@ -471,6 +550,20 @@ function App() {
 
   return (
     <div className="App">
+      {showEarlyWinOption && (
+        <div className="early-win-notification">
+          <div className="early-win-content">
+            <span className="early-win-icon">🏆</span>
+            <span className="early-win-text">
+              You're in the lead and all opponents are out!
+            </span>
+            <button className="early-win-btn" onClick={() => setGameOver(true)}>
+              End Game
+            </button>
+          </div>
+        </div>
+      )}
+
       {skippedNotification && (
         <div className="skipped-notification">
           <div className="skipped-content">
@@ -534,6 +627,8 @@ function App() {
         neutralTurnPlayer={neutralTurnPlayer}
         getCurrentPlayer={getCurrentPlayer}
         isNeutralColor={isNeutralColor}
+        playerTypes={playerTypes}
+        playerNames={playerNames}
       />
 
       <div className={`game-layout ${isMobile && selectedPiece ? 'mobile-placement-mode' : ''}`}>
@@ -550,6 +645,7 @@ function App() {
             isMobile={isMobile}
             mobilePosition={mobilePosition}
             onMobilePositionChange={setMobilePosition}
+            playerNames={playerNames}
           />
         </div>
 

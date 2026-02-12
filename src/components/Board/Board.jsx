@@ -14,7 +14,8 @@ const Board = ({
   isNeutralColor,
   isMobile = false,
   mobilePosition = null,
-  onMobilePositionChange = null
+  onMobilePositionChange = null,
+  playerNames = null
 }) => {
   const [hoverPosition, setHoverPosition] = useState(null);
   const [toast, setToast] = useState(null);
@@ -242,17 +243,33 @@ const Board = ({
     return false;
   };
 
+  // Get player display name
+  const getPlayerDisplayName = (playerId) => {
+    // Check if custom names are provided and this player has a custom name
+    if (playerNames && playerNames[playerId] && playerNames[playerId].trim()) {
+      return playerNames[playerId].trim();
+    }
+
+    // Otherwise use default names based on mode
+    if (playerCount === 2 || playerCount === 3) {
+      return `Player ${playerId + 1}`;
+    } else {
+      // For 4-player mode, use color names as default if no custom name
+      return COLOR_NAMES[playerId];
+    }
+  };
+
   // Get the banner text based on player mode
   const getBannerText = () => {
     if (playerCount === 3 && isNeutralColor && isNeutralColor(currentPlayer)) {
-      return `Player ${neutralTurnPlayer + 1} plays ${COLOR_NAMES[currentPlayer]} (Neutral)`;
+      return `${getPlayerDisplayName(neutralTurnPlayer)} plays ${COLOR_NAMES[currentPlayer]} (Neutral)`;
     }
     if (playerCount === 2) {
       const mode = PLAYER_MODES[2];
-      const playerNum = mode.colorToPlayer[currentPlayer] + 1;
-      return `Player ${playerNum} - ${COLOR_NAMES[currentPlayer]}'s Turn`;
+      const playerId = mode.colorToPlayer[currentPlayer];
+      return `${getPlayerDisplayName(playerId)} - ${COLOR_NAMES[currentPlayer]}'s Turn`;
     }
-    return `${COLOR_NAMES[currentPlayer]}'s Turn`;
+    return `${getPlayerDisplayName(currentPlayer)}'s Turn`;
   };
 
   // Render corner markers for first moves (only show if color hasn't placed first piece)

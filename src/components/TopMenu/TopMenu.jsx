@@ -18,8 +18,28 @@ const TopMenu = ({
   playerCount = 4,
   neutralTurnPlayer = 0,
   getCurrentPlayer,
-  isNeutralColor
+  isNeutralColor,
+  playerTypes = { 0: 'human', 1: 'human', 2: 'human', 3: 'human' },
+  playerNames = null
 }) => {
+
+  // Get player display name
+  const getPlayerDisplayName = (playerId) => {
+    // Check if custom names are provided and this player has a custom name
+    if (playerNames && playerNames[playerId] && playerNames[playerId].trim()) {
+      return playerNames[playerId].trim();
+    }
+
+    // Otherwise use default names based on mode
+    if (playerCount === 2) {
+      return `Player ${playerId + 1}`;
+    } else if (playerCount === 3) {
+      return `Player ${playerId + 1}`;
+    } else {
+      // For 4-player mode, use color names as default if no custom name
+      return COLOR_NAMES[playerId];
+    }
+  };
   const [isPauseOpen, setIsPauseOpen] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
 
@@ -132,7 +152,8 @@ const TopMenu = ({
               style={{ backgroundColor: PLAYER_COLORS[colorId] }}
             />
             <span className="player-score-name">
-              {COLOR_NAMES[colorId]}
+              {getPlayerDisplayName(colorId)}
+              {playerTypes[colorId] === 'cpu' && <span className="cpu-badge">🤖</span>}
               {playersOut[colorId] && <span className="out-badge">OUT</span>}
             </span>
           </div>
@@ -186,7 +207,8 @@ const TopMenu = ({
                 ))}
               </div>
               <span className="player-score-name">
-                Player {playerId + 1}
+                {getPlayerDisplayName(playerId)}
+                {playerTypes[playerId] === 'cpu' && <span className="cpu-badge">🤖</span>}
                 {isOut && <span className="out-badge">OUT</span>}
               </span>
             </div>
@@ -239,7 +261,8 @@ const TopMenu = ({
                 style={{ backgroundColor: PLAYER_COLORS[colorId] }}
               />
               <span className="player-score-name">
-                Player {playerId + 1}
+                {getPlayerDisplayName(playerId)}
+                {playerTypes[playerId] === 'cpu' && <span className="cpu-badge">🤖</span>}
                 {isOut && <span className="out-badge">OUT</span>}
               </span>
             </div>
@@ -328,18 +351,6 @@ const TopMenu = ({
 
       {/* Action Buttons Section */}
       <div className="top-menu-actions">
-        <button
-          className={`menu-btn undo-btn ${!canUndo ? 'disabled' : ''}`}
-          onClick={onUndo}
-          disabled={!canUndo}
-          title="Undo last move"
-        >
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-            <path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/>
-          </svg>
-          <span>Undo</span>
-        </button>
-
         <button
           className="menu-btn pass-btn"
           onClick={onPass}
