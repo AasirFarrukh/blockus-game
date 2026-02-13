@@ -223,7 +223,7 @@ export const useGameState = (initialPlayerCount = 4, gameConfig = null) => {
       setGameOver(true);
     }
 
-    return { success: true, skippedPlayers };
+    return { success: true, skippedPlayers, gameOver: isGameOver };
   }, [board, currentPlayer, firstMoves, usedPieces, playersOut, neutralTurnPlayer, findNextPlayer]);
 
   // Undo last move

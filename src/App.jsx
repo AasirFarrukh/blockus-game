@@ -244,8 +244,9 @@ function App() {
       setShowHintButton(false);
       setHintMove(null);
       setHintAnimating(false);
-      // Show notification if any players were skipped
-      if (result.skippedPlayers && result.skippedPlayers.length > 0) {
+      // Only show skip notification if game is NOT ending
+      // (Don't show "player skipped" when game is over)
+      if (result.skippedPlayers && result.skippedPlayers.length > 0 && !result.gameOver) {
         const skippedNames = result.skippedPlayers.map(id => COLOR_NAMES[id]);
         setSkippedNotification(skippedNames);
       }
@@ -576,6 +577,7 @@ function App() {
   // Get final scores for game over screen
   const getFinalScores = () => {
     const scores = [];
+    const totalPiecesPerColor = Object.keys(PIECE_SHAPES).length; // 21 pieces
 
     if (playerCount === 2) {
       // 2-player mode: combine diagonal colors
@@ -583,13 +585,19 @@ function App() {
         id: 0,
         name: getPlayerDisplayName(0),
         score: calculatePlayerScore(0),
-        colors: [0, 2] // Blue + Green
+        colors: [0, 2], // Blue + Green
+        piecesRemaining: (totalPiecesPerColor - usedPieces[0].length) + (totalPiecesPerColor - usedPieces[2].length),
+        totalPieces: totalPiecesPerColor * 2,
+        isPerfect: usedPieces[0].length === totalPiecesPerColor && usedPieces[2].length === totalPiecesPerColor
       });
       scores.push({
         id: 1,
         name: getPlayerDisplayName(1),
         score: calculatePlayerScore(1),
-        colors: [1, 3] // Red + Yellow
+        colors: [1, 3], // Red + Yellow
+        piecesRemaining: (totalPiecesPerColor - usedPieces[1].length) + (totalPiecesPerColor - usedPieces[3].length),
+        totalPieces: totalPiecesPerColor * 2,
+        isPerfect: usedPieces[1].length === totalPiecesPerColor && usedPieces[3].length === totalPiecesPerColor
       });
     } else if (playerCount === 3) {
       // 3-player mode: individual scores + neutral
@@ -598,7 +606,10 @@ function App() {
           id: i,
           name: getPlayerDisplayName(i),
           score: calculatePlayerScore(i),
-          colors: [i]
+          colors: [i],
+          piecesRemaining: totalPiecesPerColor - usedPieces[i].length,
+          totalPieces: totalPiecesPerColor,
+          isPerfect: usedPieces[i].length === totalPiecesPerColor
         });
       }
       // Add neutral score separately (doesn't compete)
@@ -607,7 +618,10 @@ function App() {
         name: 'Neutral',
         score: calculateColorScore(3),
         colors: [3],
-        isNeutral: true
+        isNeutral: true,
+        piecesRemaining: totalPiecesPerColor - usedPieces[3].length,
+        totalPieces: totalPiecesPerColor,
+        isPerfect: usedPieces[3].length === totalPiecesPerColor
       });
     } else {
       // 4-player mode: standard
@@ -616,7 +630,10 @@ function App() {
           id: i,
           name: getPlayerDisplayName(i),
           score: calculatePlayerScore(i),
-          colors: [i]
+          colors: [i],
+          piecesRemaining: totalPiecesPerColor - usedPieces[i].length,
+          totalPieces: totalPiecesPerColor,
+          isPerfect: usedPieces[i].length === totalPiecesPerColor
         });
       }
     }
@@ -673,32 +690,111 @@ function App() {
       {gameOver && (
         <div className="game-over-overlay">
           <div className="game-over-modal">
-            <h2>Game Over!</h2>
-            <div className="final-scores">
-              {getFinalScores().map((player, index) => (
-                <div
-                  key={player.id}
-                  className={`score-row ${index === 0 && !player.isNeutral ? 'winner' : ''} ${player.isNeutral ? 'neutral-row' : ''}`}
-                >
-                  <span className="rank">{player.isNeutral ? '-' : index + 1}</span>
-                  <div className="player-colors">
-                    {player.colors.map(colorId => (
-                      <span
-                        key={colorId}
-                        className="player-dot"
-                        style={{ backgroundColor: PLAYER_COLORS[colorId] }}
-                      ></span>
-                    ))}
+            {(() => {
+              const finalScores = getFinalScores();
+              const winner = finalScores[0];
+              const topScore = winner && !winner.isNeutral ? winner.score : 0;
+              const isTie = finalScores.filter(p => !p.isNeutral && p.score === topScore).length > 1;
+
+              return (
+                <>
+                  <div className="game-over-title">
+                    <h2>Game Over</h2>
                   </div>
-                  <span className="player-name">{player.name}</span>
-                  <span className="player-score">{player.score} pts</span>
-                </div>
-              ))}
-            </div>
-            <div className="modal-buttons">
-              <button onClick={handleReset}>Play Again</button>
-              <button onClick={handleBackToMenu} className="secondary">Main Menu</button>
-            </div>
+
+                  {!isTie && winner && !winner.isNeutral && (
+                    <div className="winner-announcement">
+                      <div className="winner-trophy">🏆</div>
+                      <div className="winner-info">
+                        <div className="winner-label">Winner</div>
+                        <div className="winner-name">
+                          <div className="winner-colors">
+                            {winner.colors.map(colorId => (
+                              <span
+                                key={colorId}
+                                className="winner-color-dot"
+                                style={{ backgroundColor: PLAYER_COLORS[colorId] }}
+                              ></span>
+                            ))}
+                          </div>
+                          {winner.name}
+                        </div>
+                        <div className="winner-score">
+                          {winner.score} points
+                          {winner.isPerfect && <span className="perfect-tag">Perfect!</span>}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {isTie && (
+                    <div className="tie-announcement">
+                      <div className="tie-icon">🤝</div>
+                      <div className="tie-text">It's a Tie!</div>
+                      <div className="tie-subtitle">{topScore} points each</div>
+                    </div>
+                  )}
+
+                  <div className="final-scores-container">
+                    <div className="final-scores-title">Final Scores</div>
+                    <div className="final-scores-list">
+                      {finalScores.map((player, index) => {
+                        const isWinner = !player.isNeutral && player.score === topScore;
+
+                        return (
+                          <div
+                            key={player.id}
+                            className={`final-score-card ${isWinner ? 'winner-card' : ''} ${player.isNeutral ? 'neutral-card' : ''}`}
+                          >
+                            <div className="score-card-rank">
+                              {player.isNeutral ? '-' : index + 1}
+                            </div>
+                            <div className="score-card-colors">
+                              {player.colors.map(colorId => (
+                                <span
+                                  key={colorId}
+                                  className="score-color-dot"
+                                  style={{ backgroundColor: PLAYER_COLORS[colorId] }}
+                                ></span>
+                              ))}
+                            </div>
+                            <div className="score-card-info">
+                              <div className="score-card-name">
+                                {player.name}
+                                {player.isPerfect && <span className="perfect-icon">✨</span>}
+                              </div>
+                              <div className="score-card-details">
+                                <span className="score-card-points">{player.score} pts</span>
+                                <span className="score-card-pieces">
+                                  {player.piecesRemaining === 0
+                                    ? 'All pieces placed'
+                                    : `${player.piecesRemaining} left`}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="modal-actions">
+                    <button className="action-btn primary-btn" onClick={handleReset}>
+                      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                        <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+                      </svg>
+                      Play Again
+                    </button>
+                    <button className="action-btn secondary-btn" onClick={handleBackToMenu}>
+                      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                        <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                      </svg>
+                      Main Menu
+                    </button>
+                  </div>
+                </>
+              );
+            })()}
           </div>
         </div>
       )}

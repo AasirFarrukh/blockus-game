@@ -118,7 +118,8 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -133,18 +134,19 @@
 
 .game-over-modal {
   background: var(--bg-secondary);
-  padding: 40px 50px;
+  padding: 24px;
   border-radius: var(--radius-xl);
-  text-align: center;
-  box-shadow: var(--shadow-lg);
-  min-width: 400px;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+  min-width: 440px;
+  max-width: 500px;
   animation: modalSlideIn 0.4s ease;
+  border: 1px solid var(--border-default);
 }
 
 @keyframes modalSlideIn {
   from {
     opacity: 0;
-    transform: scale(0.9) translateY(-20px);
+    transform: scale(0.95) translateY(-20px);
   }
   to {
     opacity: 1;
@@ -152,185 +154,446 @@
   }
 }
 
-.game-over-modal h2 {
-  font-size: 28px;
+/* Game Over Title */
+.game-over-title {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.game-over-title h2 {
+  font-size: 20px;
   font-weight: 700;
   color: var(--text-primary);
-  margin-bottom: 25px;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 2px;
 }
 
-.final-scores {
-  margin-bottom: 30px;
-}
-
-.score-row {
+/* Winner Announcement */
+.winner-announcement {
   display: flex;
   align-items: center;
-  padding: 14px 18px;
-  margin: 8px 0;
-  background: var(--bg-tertiary);
-  border-radius: var(--radius-md);
-  gap: 12px;
-  transition: all var(--transition-fast);
+  gap: 16px;
+  padding: 18px 20px;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 2px solid #f59e0b;
+  border-radius: var(--radius-lg);
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
 }
 
-.score-row.winner {
-  background: #fef3c7;
-  border: 2px solid var(--player-yellow);
+.winner-trophy {
+  font-size: 48px;
+  line-height: 1;
+  animation: trophyFloat 2s ease-in-out infinite;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
-.rank {
+@keyframes trophyFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.winner-info {
+  flex: 1;
+  text-align: left;
+}
+
+.winner-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: #92400e;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.winner-name {
+  font-size: 22px;
   font-weight: 700;
-  font-size: 18px;
-  color: var(--text-muted);
-  width: 30px;
+  color: #78350f;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.score-row.winner .rank {
-  color: var(--player-yellow);
-}
-
-.player-colors {
+.winner-colors {
   display: flex;
   gap: 4px;
 }
 
-.player-dot {
-  width: 22px;
-  height: 22px;
+.winner-color-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.winner-score {
+  font-size: 14px;
+  font-weight: 600;
+  color: #92400e;
+}
+
+.perfect-tag {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  background: #78350f;
+  color: white;
+  border-radius: var(--radius-sm);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Tie Announcement */
+.tie-announcement {
+  padding: 20px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.tie-icon {
+  font-size: 40px;
+  margin-bottom: 8px;
+}
+
+.tie-text {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.tie-subtitle {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* Final Scores Container */
+.final-scores-container {
+  margin-bottom: 20px;
+}
+
+.final-scores-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.final-scores-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Final Score Cards */
+.final-score-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+}
+
+.final-score-card.winner-card {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 2px solid #f59e0b;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2);
+}
+
+.final-score-card.neutral-card {
+  opacity: 0.65;
+  border-style: dashed;
+}
+
+.score-card-rank {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-muted);
+  width: 24px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.final-score-card.winner-card .score-card-rank {
+  color: #92400e;
+}
+
+.score-card-colors {
+  display: flex;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.score-color-dot {
+  width: 16px;
+  height: 16px;
   border-radius: var(--radius-sm);
   box-shadow: var(--shadow-sm);
 }
 
-.player-dot.color-0 { background: var(--player-blue); }
-.player-dot.color-1 { background: var(--player-red); }
-.player-dot.color-2 { background: var(--player-green); }
-.player-dot.color-3 { background: var(--player-yellow); }
-
-.score-row.neutral-row {
-  opacity: 0.6;
-  border-top: 1px dashed var(--border-default);
-  margin-top: 8px;
-  padding-top: 16px;
+.score-card-info {
+  flex: 1;
+  min-width: 0;
 }
 
-.score-row .player-name {
-  flex: 1;
-  text-align: left;
+.score-card-name {
+  font-size: 14px;
   font-weight: 600;
   color: var(--text-primary);
-  font-size: 15px;
+  margin-bottom: 3px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
-.player-score {
+.final-score-card.winner-card .score-card-name {
+  color: #78350f;
+}
+
+.perfect-icon {
+  font-size: 12px;
+  animation: sparkle 1.5s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.15); }
+}
+
+.score-card-details {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 11px;
+}
+
+.score-card-points {
   font-weight: 700;
-  font-size: 18px;
+  font-size: 15px;
   color: var(--text-primary);
 }
 
-.modal-buttons {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
+.final-score-card.winner-card .score-card-points {
+  color: #92400e;
 }
 
-.modal-buttons button {
-  padding: 14px 32px;
-  font-size: 15px;
+.score-card-pieces {
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 10px;
+}
+
+/* Modal Actions */
+.modal-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.action-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 18px;
+  font-size: 13px;
   font-weight: 600;
   border: none;
   border-radius: var(--radius-md);
   cursor: pointer;
-  transition: all var(--transition-normal);
+  transition: all var(--transition-fast);
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
   position: relative;
   overflow: hidden;
 }
 
-.modal-buttons button::before {
+.action-btn::before {
   content: '';
   position: absolute;
   top: 0;
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
   transition: left 0.5s ease;
 }
 
-.modal-buttons button:hover::before {
+.action-btn:hover::before {
   left: 100%;
 }
 
-.modal-buttons button:first-child {
-  background: var(--btn-primary);
-  color: white;
+.action-btn svg {
+  flex-shrink: 0;
 }
 
-.modal-buttons button:first-child:hover {
+.primary-btn {
+  background: var(--btn-primary);
+  color: white;
+  box-shadow: var(--shadow-sm);
+}
+
+.primary-btn:hover {
   background: var(--btn-primary-hover);
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
 }
 
-.modal-buttons button.secondary {
+.primary-btn:active {
+  transform: translateY(0);
+}
+
+.secondary-btn {
   background: var(--bg-tertiary);
   color: var(--text-primary);
   border: 1px solid var(--border-default);
 }
 
-.modal-buttons button.secondary:hover {
-  background: var(--border-default);
+.secondary-btn:hover {
+  background: var(--btn-neutral);
+  color: white;
+  border-color: var(--btn-neutral);
   transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.secondary-btn:active {
+  transform: translateY(0);
 }
 
 /* Mobile Game Over Modal */
 @media (max-width: 480px) {
   .game-over-modal {
     min-width: auto;
-    width: calc(100% - 40px);
-    max-width: 350px;
-    padding: 25px 20px;
+    width: calc(100% - 32px);
+    max-width: 380px;
+    padding: 18px;
   }
 
-  .game-over-modal h2 {
-    font-size: 22px;
-    margin-bottom: 18px;
-  }
-
-  .score-row {
-    padding: 10px 12px;
-    margin: 6px 0;
-  }
-
-  .rank {
+  .game-over-title h2 {
     font-size: 16px;
-    width: 25px;
+    letter-spacing: 1.5px;
   }
 
-  .player-dot {
-    width: 18px;
-    height: 18px;
+  .winner-announcement {
+    padding: 14px 16px;
+    gap: 12px;
+    margin-bottom: 16px;
   }
 
-  .score-row .player-name {
-    font-size: 13px;
+  .winner-trophy {
+    font-size: 36px;
   }
 
-  .player-score {
-    font-size: 15px;
+  .winner-label {
+    font-size: 9px;
   }
 
-  .modal-buttons {
-    flex-direction: column;
+  .winner-name {
+    font-size: 18px;
+    gap: 6px;
+  }
+
+  .winner-color-dot {
+    width: 16px;
+    height: 16px;
+  }
+
+  .winner-score {
+    font-size: 12px;
+  }
+
+  .perfect-tag {
+    font-size: 9px;
+    padding: 2px 6px;
+  }
+
+  .tie-announcement {
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  .tie-icon {
+    font-size: 32px;
+  }
+
+  .tie-text {
+    font-size: 18px;
+  }
+
+  .tie-subtitle {
+    font-size: 11px;
+  }
+
+  .final-scores-container {
+    margin-bottom: 16px;
+  }
+
+  .final-scores-title {
+    font-size: 10px;
+    margin-bottom: 8px;
+  }
+
+  .final-scores-list {
+    gap: 6px;
+  }
+
+  .final-score-card {
+    padding: 10px 12px;
     gap: 10px;
   }
 
-  .modal-buttons button {
-    padding: 12px 24px;
+  .score-card-rank {
     font-size: 14px;
-    width: 100%;
+    width: 20px;
+  }
+
+  .score-color-dot {
+    width: 14px;
+    height: 14px;
+  }
+
+  .score-card-name {
+    font-size: 12px;
+  }
+
+  .score-card-points {
+    font-size: 13px;
+  }
+
+  .score-card-pieces {
+    font-size: 9px;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .action-btn {
+    padding: 11px 16px;
+    font-size: 12px;
+    gap: 6px;
+  }
+
+  .action-btn svg {
+    width: 16px;
+    height: 16px;
   }
 }
 
