@@ -55,8 +55,8 @@
 /* Transform Controls */
 .transform-controls {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  flex-direction: row;
+  gap: 6px;
   flex-shrink: 0;
 }
 
@@ -102,8 +102,8 @@
 /* Action Controls */
 .action-controls {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  flex-direction: row;
+  gap: 6px;
   flex-shrink: 0;
 }
 
@@ -173,7 +173,7 @@
 @media (max-width: 480px) {
   .mobile-controls {
     padding: 6px 8px;
-    gap: 8px;
+    gap: 6px;
   }
 
   /* Hide piece preview on smaller screens to save space */
@@ -181,10 +181,14 @@
     display: none;
   }
 
+  .transform-controls {
+    gap: 4px;
+  }
+
   .transform-btn {
     padding: 7px 10px;
     font-size: 10px;
-    min-width: 62px;
+    min-width: 60px;
     gap: 3px;
   }
 
@@ -193,10 +197,14 @@
     height: 12px;
   }
 
+  .action-controls {
+    gap: 4px;
+  }
+
   .action-btn {
-    padding: 8px 12px;
+    padding: 8px 10px;
     font-size: 10px;
-    min-width: 68px;
+    min-width: 62px;
     gap: 3px;
   }
 
@@ -209,7 +217,7 @@
 @media (max-width: 380px) {
   .mobile-controls {
     padding: 5px 6px;
-    gap: 6px;
+    gap: 5px;
   }
 
   .transform-controls {

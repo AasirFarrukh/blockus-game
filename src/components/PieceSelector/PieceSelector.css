@@ -212,6 +212,11 @@
     letter-spacing: 0;
   }
 
+  /* Hide CPU notice on mobile - already shown in TopMenu */
+  .cpu-player-notice {
+    display: none;
+  }
+
   /* Hide desktop controls on mobile - we use MobileControls instead */
   .piece-controls {
     display: none;
