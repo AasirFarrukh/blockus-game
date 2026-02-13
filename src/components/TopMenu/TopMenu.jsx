@@ -355,7 +355,7 @@ const TopMenu = ({
       {/* Action Buttons Section */}
       <div className="top-menu-actions">
         <button
-          className="menu-btn pass-btn"
+          className="menu-btn pass-btn show-text-mobile"
           onClick={onPass}
           title={isCurrentPlayerCPU ? "CPU player's turn" : "Pass your turn"}
           disabled={isCurrentPlayerCPU}
@@ -398,7 +398,7 @@ const TopMenu = ({
         </button>
 
         <button
-          className="menu-btn icon-btn"
+          className="menu-btn icon-btn fullscreen-btn"
           onClick={onToggleFullscreen}
           title={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
         >

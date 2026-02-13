@@ -158,6 +158,8 @@ function App() {
       const elapsed = Date.now() - lastMoveTime;
       if (elapsed >= 30000) { // 30 seconds
         setShowHintButton(true);
+      } else {
+        setShowHintButton(false);
       }
     }, 1000);
 

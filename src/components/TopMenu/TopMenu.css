@@ -671,8 +671,18 @@
     display: none;
   }
 
+  /* Show text for specific buttons on mobile */
+  .show-text-mobile span {
+    display: inline;
+  }
+
   .menu-btn {
     padding: 10px;
+  }
+
+  /* Hide fullscreen button on mobile as it doesn't work */
+  .fullscreen-btn {
+    display: none;
   }
 }
 
