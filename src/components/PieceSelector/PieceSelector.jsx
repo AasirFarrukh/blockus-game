@@ -4,7 +4,7 @@ import Piece from '../Piece/Piece';
 import { PIECE_SHAPES, PLAYER_COLORS } from '../../data/pieces';
 import { rotatePiece, flipPiece } from '../../utils/gameLogic';
 
-const PieceSelector = ({ currentPlayer, usedPieces, selectedPiece, onSelectPiece, onRotate, onFlip }) => {
+const PieceSelector = ({ currentPlayer, usedPieces, selectedPiece, onSelectPiece, onRotate, onFlip, isCurrentPlayerCPU = false }) => {
   const [rotation, setRotation] = useState(0);
   const [flipped, setFlipped] = useState(false);
 
@@ -17,6 +17,11 @@ const PieceSelector = ({ currentPlayer, usedPieces, selectedPiece, onSelectPiece
   }, [selectedPiece, currentPlayer]);
 
   const handlePieceClick = (pieceId, shape) => {
+    // Don't allow piece selection for CPU players
+    if (isCurrentPlayerCPU) {
+      return;
+    }
+
     if (usedPieces[currentPlayer].includes(pieceId)) {
       return;
     }
@@ -29,7 +34,7 @@ const PieceSelector = ({ currentPlayer, usedPieces, selectedPiece, onSelectPiece
   };
 
   const handleRotate = () => {
-    if (!selectedPiece) return;
+    if (!selectedPiece || isCurrentPlayerCPU) return;
 
     const newRotation = (rotation + 1) % 4;
     setRotation(newRotation);
@@ -51,7 +56,7 @@ const PieceSelector = ({ currentPlayer, usedPieces, selectedPiece, onSelectPiece
   };
 
   const handleFlip = () => {
-    if (!selectedPiece) return;
+    if (!selectedPiece || isCurrentPlayerCPU) return;
 
     const newFlipped = !flipped;
     setFlipped(newFlipped);
@@ -135,10 +140,17 @@ const PieceSelector = ({ currentPlayer, usedPieces, selectedPiece, onSelectPiece
   }, [handleKeyDown]);
 
   return (
-    <div className="piece-selector">
+    <div className={`piece-selector ${isCurrentPlayerCPU ? 'cpu-player' : ''}`}>
       <h3>Pieces</h3>
 
-      {selectedPiece && (
+      {isCurrentPlayerCPU && (
+        <div className="cpu-player-notice">
+          <span className="cpu-icon">🤖</span>
+          <span className="cpu-text">CPU Player's Turn</span>
+        </div>
+      )}
+
+      {selectedPiece && !isCurrentPlayerCPU && (
         <div className="piece-controls">
           <div className="piece-controls-buttons">
             <button onClick={handleRotate}>Rotate</button>

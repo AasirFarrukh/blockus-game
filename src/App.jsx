@@ -9,6 +9,7 @@ import { useGameState } from './hooks/useGameState';
 import { isValidPlacement } from './utils/validation';
 import { PIECE_SHAPES, PLAYER_MODES, PLAYER_COLORS, COLOR_NAMES } from './data/pieces';
 import { rotatePiece, flipPiece } from './utils/gameLogic';
+import { generateAIMove } from './ai/AIController';
 
 // Sound effects using Web Audio API
 const createSoundEffects = () => {
@@ -97,6 +98,12 @@ function App() {
   const [rotation, setRotation] = useState(0);
   const [flipped, setFlipped] = useState(false);
 
+  // Hint system
+  const [lastMoveTime, setLastMoveTime] = useState(Date.now());
+  const [showHintButton, setShowHintButton] = useState(false);
+  const [hintMove, setHintMove] = useState(null);
+  const [hintAnimating, setHintAnimating] = useState(false);
+
   const {
     board,
     currentPlayer,
@@ -120,6 +127,14 @@ function App() {
     playerNames
   } = useGameState(selectedPlayerCount, gameConfig);
 
+  // Check if current player is human
+  const isCurrentPlayerHuman = useCallback(() => {
+    if (playerCount === 3 && isNeutralColor && isNeutralColor(currentPlayer)) {
+      return playerTypes[neutralTurnPlayer] === 'human';
+    }
+    return playerTypes[currentPlayer] === 'human';
+  }, [currentPlayer, playerTypes, playerCount, isNeutralColor, neutralTurnPlayer]);
+
   // Initialize sounds on first interaction
   useEffect(() => {
     const initSounds = () => {
@@ -131,6 +146,31 @@ function App() {
     window.addEventListener('click', initSounds);
     return () => window.removeEventListener('click', initSounds);
   }, []);
+
+  // Hint timer - show hint button after 30 seconds for human players
+  useEffect(() => {
+    if (gameOver || !isCurrentPlayerHuman()) {
+      setShowHintButton(false);
+      return;
+    }
+
+    const timer = setInterval(() => {
+      const elapsed = Date.now() - lastMoveTime;
+      if (elapsed >= 30000) { // 30 seconds
+        setShowHintButton(true);
+      }
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [lastMoveTime, gameOver, isCurrentPlayerHuman]);
+
+  // Reset hint when player changes
+  useEffect(() => {
+    setLastMoveTime(Date.now());
+    setShowHintButton(false);
+    setHintMove(null);
+    setHintAnimating(false);
+  }, [currentPlayer]);
 
   // Play game over sound
   useEffect(() => {
@@ -199,6 +239,11 @@ function App() {
     const result = placePiece(row, col, shape, pieceId);
     if (result && result.success) {
       if (sounds && soundEnabled) sounds.place();
+      // Reset hint timer
+      setLastMoveTime(Date.now());
+      setShowHintButton(false);
+      setHintMove(null);
+      setHintAnimating(false);
       // Show notification if any players were skipped
       if (result.skippedPlayers && result.skippedPlayers.length > 0) {
         const skippedNames = result.skippedPlayers.map(id => COLOR_NAMES[id]);
@@ -209,6 +254,54 @@ function App() {
     }
     return result;
   };
+
+  // Handle hint button click
+  const handleHint = useCallback(() => {
+    // Generate ally and opponent colors based on player mode
+    const mode = PLAYER_MODES[playerCount];
+    let allyColors, opponentColors;
+
+    if (playerCount === 2) {
+      const actualPlayer = mode.colorToPlayer[currentPlayer];
+      allyColors = mode.playerColors[actualPlayer];
+      const opponentPlayer = actualPlayer === 0 ? 1 : 0;
+      opponentColors = mode.playerColors[opponentPlayer];
+    } else if (playerCount === 3) {
+      if (currentPlayer === mode.neutralColor) {
+        const controllingPlayer = neutralTurnPlayer;
+        allyColors = [controllingPlayer, currentPlayer];
+        opponentColors = [0, 1, 2].filter(p => p !== controllingPlayer);
+      } else {
+        allyColors = [currentPlayer];
+        opponentColors = [0, 1, 2, 3].filter(c => c !== currentPlayer);
+      }
+    } else {
+      allyColors = [currentPlayer];
+      opponentColors = [0, 1, 2, 3].filter(c => c !== currentPlayer);
+    }
+
+    // Generate a hint move using medium difficulty AI
+    const suggestedMove = generateAIMove(
+      board,
+      currentPlayer,
+      usedPieces,
+      firstMoves[currentPlayer],
+      'medium',
+      playerCount,
+      allyColors,
+      opponentColors
+    );
+
+    if (suggestedMove) {
+      setHintMove(suggestedMove);
+      setHintAnimating(true);
+      // Auto-hide hint after 5 seconds
+      setTimeout(() => {
+        setHintAnimating(false);
+        setHintMove(null);
+      }, 5000);
+    }
+  }, [board, currentPlayer, usedPieces, firstMoves, playerCount, neutralTurnPlayer]);
 
   // Auto-dismiss skipped notification
   useEffect(() => {
@@ -629,6 +722,9 @@ function App() {
         isNeutralColor={isNeutralColor}
         playerTypes={playerTypes}
         playerNames={playerNames}
+        showHintButton={showHintButton}
+        onHint={handleHint}
+        isCurrentPlayerCPU={!isCurrentPlayerHuman()}
       />
 
       <div className={`game-layout ${isMobile && selectedPiece ? 'mobile-placement-mode' : ''}`}>
@@ -646,6 +742,8 @@ function App() {
             mobilePosition={mobilePosition}
             onMobilePositionChange={setMobilePosition}
             playerNames={playerNames}
+            hintMove={hintMove}
+            hintAnimating={hintAnimating}
           />
         </div>
 
@@ -671,6 +769,7 @@ function App() {
               onSelectPiece={handleSelectPiece}
               onRotate={handleRotate}
               onFlip={handleFlip}
+              isCurrentPlayerCPU={!isCurrentPlayerHuman()}
             />
           )}
         </div>

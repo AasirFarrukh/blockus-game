@@ -255,9 +255,47 @@
   color: white;
 }
 
-.pass-btn:hover {
+.pass-btn:hover:not(:disabled) {
   background: linear-gradient(135deg, var(--btn-secondary-hover) 0%, #1d4ed8 100%);
   box-shadow: 0 4px 12px rgba(0, 102, 179, 0.3);
+}
+
+.pass-btn:disabled {
+  background: var(--bg-tertiary);
+  color: var(--text-muted);
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.pass-btn:disabled::before {
+  display: none;
+}
+
+/* Hint Button */
+.hint-btn {
+  background: linear-gradient(135deg, #FFB300 0%, #FF8F00 100%);
+  color: white;
+  font-weight: 600;
+}
+
+.hint-btn:hover {
+  background: linear-gradient(135deg, #FFA000 0%, #FF6F00 100%);
+  box-shadow: 0 4px 12px rgba(255, 179, 0, 0.4);
+}
+
+.hint-btn.glowing {
+  animation: glowPulse 2s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(255, 179, 0, 0.6), 0 0 20px rgba(255, 179, 0, 0.4);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 179, 0, 0.8), 0 0 30px rgba(255, 179, 0, 0.6), 0 0 40px rgba(255, 179, 0, 0.3);
+    transform: scale(1.05);
+  }
 }
 
 /* Pause/Menu Button */

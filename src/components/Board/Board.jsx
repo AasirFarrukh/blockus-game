@@ -15,7 +15,9 @@ const Board = ({
   isMobile = false,
   mobilePosition = null,
   onMobilePositionChange = null,
-  playerNames = null
+  playerNames = null,
+  hintMove = null,
+  hintAnimating = false
 }) => {
   const [hoverPosition, setHoverPosition] = useState(null);
   const [toast, setToast] = useState(null);
@@ -335,12 +337,25 @@ const Board = ({
               const isJustPlaced = placedCells.includes(`${rowIndex}-${colIndex}`);
               const cellKey = `${rowIndex}-${colIndex}`;
 
+              // Check if this cell is part of the hint
+              const isHintCell = hintAnimating && hintMove && (() => {
+                const { row: hintRow, col: hintCol, shape } = hintMove;
+                for (let r = 0; r < shape.length; r++) {
+                  for (let c = 0; c < shape[0].length; c++) {
+                    if (shape[r][c] === 1 && hintRow + r === rowIndex && hintCol + c === colIndex) {
+                      return true;
+                    }
+                  }
+                }
+                return false;
+              })();
+
               return (
                 <div
                   key={cellKey}
                   className={`board-cell ${cell !== null ? 'filled' : ''} ${
                     isPreview ? (previewValid ? 'preview valid' : 'preview invalid') : ''
-                  } ${isJustPlaced ? 'just-placed' : ''}`}
+                  } ${isJustPlaced ? 'just-placed' : ''} ${isHintCell ? 'hint-cell' : ''}`}
                   style={{
                     backgroundColor: cell !== null
                       ? PLAYER_COLORS[cell]
