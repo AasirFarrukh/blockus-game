@@ -52,80 +52,6 @@
   pointer-events: none;
 }
 
-/* D-Pad Controls */
-.dpad-container {
-  display: grid;
-  grid-template-columns: repeat(3, 32px);
-  grid-template-rows: repeat(3, 32px);
-  gap: 2px;
-  flex-shrink: 0;
-}
-
-.dpad-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--bg-tertiary);
-  border: 1.5px solid var(--border-default);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  color: var(--text-primary);
-  padding: 0;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-}
-
-.dpad-btn svg {
-  width: 16px;
-  height: 16px;
-}
-
-.dpad-btn:active {
-  background: var(--btn-secondary);
-  border-color: var(--btn-secondary);
-  color: white;
-  transform: scale(0.9);
-}
-
-.dpad-up {
-  grid-column: 2;
-  grid-row: 1;
-}
-
-.dpad-left {
-  grid-column: 1;
-  grid-row: 2;
-}
-
-.dpad-center {
-  grid-column: 2;
-  grid-row: 2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--bg-tertiary);
-  border-radius: var(--radius-sm);
-  border: 1.5px solid var(--border-default);
-}
-
-.position-indicator {
-  font-size: 8px;
-  font-weight: 600;
-  color: var(--text-muted);
-  font-family: monospace;
-}
-
-.dpad-right {
-  grid-column: 3;
-  grid-row: 2;
-}
-
-.dpad-down {
-  grid-column: 2;
-  grid-row: 3;
-}
-
 /* Transform Controls */
 .transform-controls {
   display: flex;
@@ -255,17 +181,6 @@
     display: none;
   }
 
-  .dpad-container {
-    grid-template-columns: repeat(3, 28px);
-    grid-template-rows: repeat(3, 28px);
-    gap: 2px;
-  }
-
-  .dpad-btn svg {
-    width: 14px;
-    height: 14px;
-  }
-
   .transform-btn {
     padding: 7px 10px;
     font-size: 10px;
@@ -289,31 +204,12 @@
     width: 14px;
     height: 14px;
   }
-
-  .position-indicator {
-    font-size: 7px;
-  }
 }
 
 @media (max-width: 380px) {
   .mobile-controls {
     padding: 5px 6px;
     gap: 6px;
-  }
-
-  .dpad-container {
-    grid-template-columns: repeat(3, 26px);
-    grid-template-rows: repeat(3, 26px);
-    gap: 1px;
-  }
-
-  .dpad-btn svg {
-    width: 12px;
-    height: 12px;
-  }
-
-  .dpad-btn {
-    border-width: 1px;
   }
 
   .transform-controls {
@@ -369,10 +265,5 @@
   .action-btn {
     min-width: 40px;
     padding: 8px;
-  }
-
-  .dpad-container {
-    grid-template-columns: repeat(3, 24px);
-    grid-template-rows: repeat(3, 24px);
   }
 }

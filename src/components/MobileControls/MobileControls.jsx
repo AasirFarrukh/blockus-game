@@ -31,49 +31,6 @@ const MobileControls = ({
         </div>
       </div>
 
-      {/* D-Pad Controls */}
-      <div className="dpad-container">
-        <button
-          className="dpad-btn dpad-up"
-          onClick={() => onMove('up')}
-          aria-label="Move up"
-        >
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 4l-8 8h16l-8-8z"/>
-          </svg>
-        </button>
-        <button
-          className="dpad-btn dpad-left"
-          onClick={() => onMove('left')}
-          aria-label="Move left"
-        >
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M4 12l8-8v16l-8-8z"/>
-          </svg>
-        </button>
-        <div className="dpad-center">
-          <span className="position-indicator">{position.row},{position.col}</span>
-        </div>
-        <button
-          className="dpad-btn dpad-right"
-          onClick={() => onMove('right')}
-          aria-label="Move right"
-        >
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M20 12l-8 8V4l8 8z"/>
-          </svg>
-        </button>
-        <button
-          className="dpad-btn dpad-down"
-          onClick={() => onMove('down')}
-          aria-label="Move down"
-        >
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 20l8-8H4l8 8z"/>
-          </svg>
-        </button>
-      </div>
-
       {/* Transform Controls */}
       <div className="transform-controls">
         <button className="transform-btn rotate-btn" onClick={onRotate}>

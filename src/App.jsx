@@ -208,6 +208,12 @@ function App() {
     setSelectedPlayerCount(config.playerCount);
     resetGame(config);
     setGameStarted(true);
+
+    // Reset hint-related state
+    setLastMoveTime(Date.now());
+    setShowHintButton(false);
+    setHintMove(null);
+    setHintAnimating(false);
   };
 
   const toggleSound = () => {
@@ -523,7 +529,7 @@ function App() {
     if (sounds && soundEnabled) sounds.deselect();
   }, [setSelectedPiece, soundEnabled]);
 
-  // Reset mobile position when piece changes
+  // Reset mobile position when piece changes (but not when just rotating/flipping)
   useEffect(() => {
     if (selectedPiece && isMobile) {
       // Start near the player's corner for first moves
@@ -539,7 +545,8 @@ function App() {
         setMobilePosition({ row: 10, col: 10 });
       }
     }
-  }, [selectedPiece, isMobile, currentPlayer, firstMoves]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedPiece?.id, isMobile, currentPlayer, firstMoves]);
 
   const handleUndo = () => {
     if (undoMove()) {
@@ -649,11 +656,23 @@ function App() {
 
   const handleReset = () => {
     resetGame(gameConfig);
+
+    // Reset hint-related state
+    setLastMoveTime(Date.now());
+    setShowHintButton(false);
+    setHintMove(null);
+    setHintAnimating(false);
   };
 
   const handleBackToMenu = () => {
     resetGame();
     setGameStarted(false);
+
+    // Reset hint-related state
+    setLastMoveTime(Date.now());
+    setShowHintButton(false);
+    setHintMove(null);
+    setHintAnimating(false);
   };
 
   if (!gameStarted) {
